@@ -17,6 +17,8 @@ class Welcome extends CI_Controller {
 				// redirect
 				if($user->user_type=='student') {
 					redirect('dashboard/student');
+				} else if($user->user_type=='admin') {
+					redirect('dashboard/admin');
 				}
 			} else {
 				$this->session->set_flashdata('notif', 'failed');

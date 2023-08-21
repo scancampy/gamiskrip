@@ -12,6 +12,60 @@ class Dashboard extends CI_Controller {
 		}
 	}
 
+	public function edit_cluster($id) {
+		$data = array();
+		$data['js'] = '';
+		$user = $this->input->cookie('user');
+		$userjson = json_decode($user);
+		
+		// check if admin
+		if($userjson->user_type!='admin') {
+			redirect('notfound');
+		}
+
+		$data['cluster'] = $this->Cluster_model->getClusterId($id);
+		$data['lecturer'] = $this->Lecturer_model->getLecturer(null, null,null, 'name', 'asc');
+
+		if(!$data['cluster']) {
+			redirect('notfound');
+		}
+
+		if($this->input->post('btnsubmit')) {
+			$array = array(
+							'supervisor1' => $this->input->post('supervisor1'),
+							'supervisor2' => $this->input->post('supervisor2')
+						  );
+			$this->Cluster_model->updateCluster($id, $array);
+
+			$this->session->set_flashdata('type', 'success');
+			$this->session->set_flashdata('message', 'Cluster updated!');
+			redirect('dashboard/edit_cluster/'.$id);
+			
+		}
+
+		// toast
+		$data['js'] .= '
+		var Toast = Swal.mixin({
+	      toast: true,
+	      position: \'top-end\',
+	      showConfirmButton: false,
+	      timer: 3000
+	    });'; 
+
+	    if(!empty($this->session->flashdata('type'))) {
+	    	$data['js'] .= '
+	    		 Toast.fire({
+			        icon: \''.$this->session->flashdata('type').'\',
+			        title: \''.$this->session->flashdata('message').'.\'
+			      });
+			    ';
+	    }
+
+		$this->load->view('v_header', $data);
+		$this->load->view('v_edit_cluster', $data);
+		$this->load->view('v_footer', $data);
+	}
+
 	public function student() {
 		$data = array();
 		$data['js'] = '';
@@ -28,14 +82,14 @@ class Dashboard extends CI_Controller {
 			redirect('survey');
 		}
 
-		$student = $this->Student_model->getStudent(null, $userjson->username);
-		if(empty($student)) {
+		$data['student'] = $this->Student_model->getStudent(null, $userjson->username);
+		if(empty($data['student'])) {
 			redirect('notfound');
 		}
 
 		// check if student not yet have thesis title
-		$thesis = $this->Thesis_model->getStudentThesis($student[0]->nrp);
-		if(empty($thesis)) {
+		$data['thesis'] = $this->Thesis_model->getStudentThesis('',$data['student'][0]->nrp);
+		if(empty($data['thesis'])) {
 			redirect('thesis/start');
 		}
 		

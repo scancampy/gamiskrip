@@ -10,7 +10,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Starter Page</li>
+              <li class="breadcrumb-item active">Thesis Start</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -45,10 +45,10 @@ This form will help you to clarify your research question, identify your methodo
                 <div class="row">
                   <div class="col-12" style="display: flex;">
                     <div class="col-6">
-                      <a href="#" class="btn btn-block btn-outline-primary">Topic Recommendation</a>
+                      <a href="<?php echo base_url('thesis/recommender'); ?>" class="btn btn-block btn-outline-primary">Topic Recommendation</a>
                     </div>
                     <div class="col-6">
-                      <a href="#" class="btn btn-block btn-outline-primary">Thesis Form</a>
+                      <a href="<?php echo base_url('thesis/inputthesis'); ?>" class="btn btn-block btn-outline-primary">Thesis Form</a>
                     </div>
                   </div>
                 </div>

@@ -15,10 +15,54 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/fontawesome-free/css/all.min.css'); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url('dist/css/adminlte.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/select2/css/select2.min.css'); ?>">
+  
+   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css'); ?>">
   <!-- Custom style -->
   <link rel="stylesheet" href="<?php echo base_url('dist/css/custom.css'); ?>">
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css'); ?>">
+
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'); ?>">
+
+  <!-- Ion Slider -->
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/ion-rangeslider/css/ion.rangeSlider.min.css'); ?>">
+
+  <style type="text/css">
+    .circle {
+      border: 1px solid;
+      border-radius: 30px;
+      padding: 10px 16px;
+      background-color: white;
+    }
+
+    .circlecontainer {
+      text-align: center;
+      z-index: 1;
+    }
+
+    .circlecontainer strong {
+      line-height: 30pt;
+    }
+
+    .line {
+      border: 1px solid lightgray;
+      position: relative;
+      top: -50px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+    }
+
+    .circlecontainerflex {
+      display: flex;
+      justify-content: space-around;
+    }
+  </style>
   
 </head>
 <body class="hold-transition layout-top-nav">
