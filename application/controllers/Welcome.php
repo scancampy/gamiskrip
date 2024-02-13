@@ -7,6 +7,12 @@ class Welcome extends CI_Controller {
 	public function index()
 	{
 		$data = array();
+		//echo password_hash('password', PASSWORD_DEFAULT);
+		/*if(password_verify('password', '$2y$10$3L2Qw1hSO0HxmI2H3TQXvubOx9fU/HvtdjWS4S5I4y/0.n0EfGYFS') ) {
+			echo 'password valid';
+		} else {
+			echo 'password invalid';
+		}*/
 
 		if($this->input->post('btnsignin')) {
 			$user = null;
@@ -19,6 +25,8 @@ class Welcome extends CI_Controller {
 					redirect('dashboard/student');
 				} else if($user->user_type=='admin') {
 					redirect('dashboard/admin');
+				} else if($user->user_type == 'lecturer') {
+					redirect('dashboard/lecturer');
 				}
 			} else {
 				$this->session->set_flashdata('notif', 'failed');

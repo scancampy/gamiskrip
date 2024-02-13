@@ -6,7 +6,9 @@ class Dashboard extends CI_Controller {
 		// Check if user cookies exists
 		parent::__construct();
 		$this->load->helper('cookie');
-		if (empty($this->input->cookie('user'))) {
+		//print_r($this->input->cookie('user'));
+		//die();
+		if ($this->input->cookie('user') == '') {
 			// Redirect to default controller
 			redirect('');
 		}
@@ -52,7 +54,7 @@ class Dashboard extends CI_Controller {
 	      timer: 3000
 	    });'; 
 
-	    if(!empty($this->session->flashdata('type'))) {
+	    if($this->session->flashdata('type') != '') {
 	    	$data['js'] .= '
 	    		 Toast.fire({
 			        icon: \''.$this->session->flashdata('type').'\',
@@ -67,6 +69,7 @@ class Dashboard extends CI_Controller {
 	}
 
 	public function student() {
+	
 		$data = array();
 		$data['js'] = '';
 		$user = $this->input->cookie('user');
@@ -78,7 +81,7 @@ class Dashboard extends CI_Controller {
 		}
 
 		// check if not yet complete the questionnaire
-		if(empty($userjson->player_style)) {
+		/*if(empty($userjson->player_style)) {
 			redirect('survey');
 		}
 
@@ -91,7 +94,7 @@ class Dashboard extends CI_Controller {
 		$data['thesis'] = $this->Thesis_model->getStudentThesis('',$data['student'][0]->nrp);
 		if(empty($data['thesis'])) {
 			redirect('thesis/start');
-		}
+		}*/
 		
 		// toast
 		$data['js'] .= '
@@ -102,7 +105,7 @@ class Dashboard extends CI_Controller {
 	      timer: 3000
 	    });'; 
 
-	    if(!empty($this->session->flashdata('type'))) {
+	    if($this->session->flashdata('type') != '') {
 	    	$data['js'] .= '
 	    		 Toast.fire({
 			        icon: \''.$this->session->flashdata('type').'\',
@@ -148,6 +151,8 @@ class Dashboard extends CI_Controller {
 	{
 		$user = $this->input->cookie('user');
 		$userjson = json_decode($user);
+
+		//print_r($userjson);
 		
 		// check if student
 		if($userjson->user_type == 'student') {

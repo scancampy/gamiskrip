@@ -1,10 +1,12 @@
 <?php 
 class User_model extends CI_Model {
 
-        public $username;
         public $password;
         public $user_type;
         public $last_login;
+        public $first_name;
+        public $last_name;
+        public $email;
 
         public function getUser($username =null, $where= null) {
                 if($username != null) {
@@ -20,7 +22,7 @@ class User_model extends CI_Model {
         }
 
         public function do_login() {
-                $query = $this->db->get_where('user', array('username' => $this->input->post('username', TRUE)));
+                $query = $this->db->get_where('user', array('email' => $this->input->post('username', TRUE)));
                 $row = $query->row();
 
                 if (isset($row))
@@ -28,7 +30,7 @@ class User_model extends CI_Model {
                       $this->password = $row->password;
                       if(password_verify($this->input->post('password', TRUE), $this->password)) {
                         //update last login
-                        $this->db->where('username', $this->input->post('username', TRUE));
+                        $this->db->where('email', $this->input->post('username', TRUE));
                         $this->db->update('user', array('last_login' => date('Y-m-d H:i:s')));
                         return $row;
                       }
@@ -36,17 +38,16 @@ class User_model extends CI_Model {
                 return false;
         }
 
-        public function add($username, $password, $user_type) {
-                // cek dulu username exist atau ga
-                $q = $this->db->get_where('user', array('username' => $username));
+        public function addStudent() {
+                $this->first_name = trim($this->input->post('first_name'));
+                $this->last_name = trim($this->input->post('last_name'));
+                $this->email = trim($this->input->post('email'));
+                $this->password = password_hash($this->input->post('password'), PASSWORD_DEFAULT);
+                $this->user_type = 'student';
+                $this->last_login = null;
 
-                if($q->num_rows() == 0) {
-                        $data = array('username' => $username, 'password' => password_hash($newpass, PASSWORD_DEFAULT), 'user_type' => $user_type );
-                        $this->db->insert('user', $data);
-                        return "success";
-                } else {
-                        return "user_exist";
-                }
+                $this->db->insert('user',$this);
+                return ($this->db->affected_rows() != 1) ? false : true;
         }
 
         public function resetpass($username, $newpass) {

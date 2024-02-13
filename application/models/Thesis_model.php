@@ -18,19 +18,19 @@ class Thesis_model extends CI_Model {
         return $q->result();
     }
 
-    public function insertThesis($title, $student_nrp, $lecturer1_npk, $lecturer2_npk, $proposal_file=null, $proposal_link = null, $start_date_in_sk) {
+    public function insertThesis($judul, $student_id, $lecturer1_id, $lecturer2_id, $proposal_url, $tanggal_st, $tanggal_akhir_st) {
         $data = array(
-                'title'                 => $title,
-                'student_nrp'           => $student_nrp,
-                'lecturer1_npk'         => $lecturer1_npk,
-                'lecturer2_npk'         => $lecturer2_npk,
-                'proposal_file'         => $proposal_file,
-                'proposal_link'         => $proposal_link,
-                'created_date'          => date('Y-m-d H:i:s'),
-                'start_date_in_sk'      => $start_date_in_sk
+                'judul'                 => $judul,
+                'student_id'            => $student_id,
+                'lecturer1_id'          => $lecturer1_id,
+                'lecturer2_id'          => $lecturer2_id,
+                'tanggal_st'            => $tanggal_st,
+                'tanggal_akhir_st'      => $tanggal_akhir_st,
+                'created'               => date('Y-m-d H:i:s'),
+                'proposal_url'          => $proposal_url
         );
 
-        $this->db->insert('thesis', $data);
+        $this->db->insert('tugas_akhir', $data);
     }
 }
 

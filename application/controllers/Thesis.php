@@ -116,6 +116,7 @@ class Thesis extends CI_Controller {
 			$nearestClusterDistance = current($distances);
 			$nearestClusterMembers = $this->Cluster_model->getClusterMember($nearestClusterId);
 
+
 			//print_r($members);
 
 			$similarities = $this->_calculateCosineSimilarity($inputCourses, $nearestClusterMembers);
@@ -173,6 +174,8 @@ class Thesis extends CI_Controller {
 					}
 				}
 
+
+
 				// Extract the 'nilai' values from the array for sorting
 				$nilaiValues = array_column($nilai, 'nilai');
 
@@ -180,6 +183,80 @@ class Thesis extends CI_Controller {
 				array_multisort($nilaiValues, SORT_DESC, $nilai);
 				$data['nilai'] = $nilai;
 
+				// Define a custom comparison function based on the 'price' key
+				function comparePrices($a, $b) {
+				    return $b->avg - $a->avg;
+				}
+
+				// Use usort to sort the array using the custom comparison function
+				
+
+				// cari mk terdekat dari cluster center -0
+				$courses_in_cluster = array();
+				for($i = 0; $i <=4; $i++) {
+					$data['cluster_center_'.$i] = $this->Cluster_model->getClusterCenterEncoding($i);
+					$nearestCourses = $this->Cluster_model->getCourseListNearCenter($i,2);
+					$courses_in_cluster[$i] = $nearestCourses;
+					$data['nearest_courses_in_'.$i] = $nearestCourses;
+					$data['result_cluster_'.$i] =$this->Cluster_model->getNilaiFromCourseList($courses_in_cluster[$i], $nilai);
+
+					//print_r($data['result_cluster_'.$i]);
+					//die();
+
+					$data['cluster_member_mark_'.$i] = $this->Cluster_model->checkMarkWithinCluster($i, $nilai);
+					usort($data['cluster_member_mark_'.$i], 'comparePrices');
+
+					//print_r($data['cluster_member_mark_'.$i]);
+				}
+
+				
+
+				$data['cluster_course_0'] = $this->Cluster_model->getClusterCourses(0);
+				$data['eligible_course_0'] = $this->Cluster_model->getNumberOfEligibleCourse(0, $nilai);
+				$data['cluster_result_0'] = $this->Cluster_model->getClusterMember(0);
+
+				
+
+				
+
+
+				//echo '<pre>';
+				//print_r($result0);
+				//echo '</pre>';
+
+//				echo count($data['cluster_result_0']);
+
+//				print_r($data['cluster_result_0']);
+
+				$data['cluster_course_1'] = $this->Cluster_model->getClusterCourses(1);
+				$data['eligible_course_1'] = $this->Cluster_model->getNumberOfEligibleCourse(1, $nilai);
+				$data['cluster_result_1'] = $this->Cluster_model->getClusterMember(1);
+
+				$data['cluster_course_2'] = $this->Cluster_model->getClusterCourses(2);
+				$data['eligible_course_2'] = $this->Cluster_model->getNumberOfEligibleCourse(2, $nilai);
+				$data['cluster_result_2'] = $this->Cluster_model->getClusterMember(2);
+
+				$data['cluster_course_3'] = $this->Cluster_model->getClusterCourses(3);
+				$data['eligible_course_3'] = $this->Cluster_model->getNumberOfEligibleCourse(3, $nilai);
+				$data['cluster_result_3'] = $this->Cluster_model->getClusterMember(3);
+
+				$data['cluster_course_4'] = $this->Cluster_model->getClusterCourses(4);
+				$data['eligible_course_4'] = $this->Cluster_model->getNumberOfEligibleCourse(4, $nilai);
+				$data['cluster_result_4'] = $this->Cluster_model->getClusterMember(4);
+
+				//print_r($data['nilai']);
+
+				$data['result0'] = $this->Cluster_model->getClusterResultBasedOnTranscripts($data['nilai'],0);
+
+				$data['result1'] = $this->Cluster_model->getClusterResultBasedOnTranscripts($data['nilai'],1);
+
+				$data['result2'] = $this->Cluster_model->getClusterResultBasedOnTranscripts($data['nilai'],2);
+
+				$data['result3'] = $this->Cluster_model->getClusterResultBasedOnTranscripts($data['nilai'],3);
+
+				$data['result4'] = $this->Cluster_model->getClusterResultBasedOnTranscripts($data['nilai'],4);
+
+				//print_r($data['result']);
 				/*foreach($nilai as $value) {
 					echo $value['nama'].' '.$value['nilai'];
 					echo '<br/>';
@@ -217,7 +294,87 @@ class Thesis extends CI_Controller {
 
 	    // datatable
 	    $data['js'] .= '
-	    $("#example2").DataTable({
+	    $("#exampleX0").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#exampleX1").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#exampleX2").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#exampleX3").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#exampleX4").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#example3").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#example4").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#example5").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	    });
+
+	    $("#example6").DataTable({
 	      "paging": true,
 	      "lengthChange": false,
 	      "searching": false,

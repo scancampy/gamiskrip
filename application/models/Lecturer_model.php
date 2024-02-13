@@ -20,7 +20,7 @@ class Lecturer_model extends CI_Model {
         $this->db->update('user', array('player_style' => $user_type_max));
     }
 
-    public function getLecturer($npk = null, $username = null, $where = null, $orderby=null, $ordertype=null) {
+    public function getLecturer($npk = null, $user_id = null, $where = null, $orderby=null, $ordertype=null) {
         if($npk!=null) {
             $this->db->where('npk', $npk);
         }
@@ -29,8 +29,8 @@ class Lecturer_model extends CI_Model {
             $this->db->order_by($orderby, $ordertype);
         }
 
-        if($username!=null) {
-            $this->db->where('username', $username);
+        if($user_id!=null) {
+            $this->db->where('user_id', $user_id);
         }
 
         if($where!=null) {
