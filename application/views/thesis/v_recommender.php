@@ -5,12 +5,12 @@
     <div class="container">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Thesis</h1>
+          <h1 class="m-0">Sistem Rekomendasi Topik</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Topic Recommender</li>
+              <li class="breadcrumb-item active">Sistem Rekomendasi Topik</li>
             </ol>
             </div><!-- /.col -->
             </div><!-- /.row -->
@@ -20,7 +20,119 @@
           <!-- Main content -->
           <div class="content">
             <div class="container">
+              <?php if(empty($nilai) &&  empty($clusterinfo)) { ?>
               <div class="row">
+                <div class="col-lg-12">
+                  <form method="post" action="<?php echo base_url('thesis/recommender'); ?>" enctype="multipart/form-data">
+                    <div class="card card-primary card-outline">
+                      <div class="card-body">
+                        
+                        <p class="card-text">Unggah <strong>transkrip</strong> nilai anda. Sistem rekomendasi topik ini menggunakan data nilai anda untuk memberikan rekomendasi topik terbaik.
+                        </p>
+                        <p>
+                          Untuk memperoleh nilai transkrip, anda dapat mengunduhnya dari my ubaya. Kemudian gunakan tools <a href="https://smallpdf.com/pdf-to-excel#r=convert-to-excel">pdf to excel</a> untuk mengkonversi pdf tersebut menjadi transkrip berbentuk excel. Kemudian format transkrip excel tersebut agar hanya memiliki 4 kolom saja, yakni <strong>no urut</strong>, <strong>kode MK</strong>, <strong>nama MK</strong>, dan <strong>nilai Nisbi</strong>. Perhatikan contoh gambar berikut ini:
+                          <br/>
+                          <img src="<?php echo base_url('images/ss_contoh_template_csv.png'); ?>" />
+                        </p>
+                        <div class="form-group">
+                          <label for="transcript_file">File Transkrip</label>
+                          <input type="file" name="transcript_file" id="transcript_file" >
+                        </div>
+                       
+                     </div>
+                     <div class="card-footer">
+                      <input type="submit" class="btn btn-primary" name="btnsubmit" value="Submit" />
+                     </div>
+                   </div>
+                 </form>
+                </div>
+              </div>
+              <?php } ?> 
+              <?php if($fileread == true) { ?>
+              <div class="row" style="margin-bottom:10px;">
+                <div class="col-lg-12 text-right" >
+                  <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" id="btnsimple" class="btn btn-primary">Simple</button>
+                    <button type="button" id="btnadvanced" class="btn btn-default">Advanced</button>
+                  </div>
+                </div>
+              </div>
+              <div class="row" id="divsimple">
+                 <?php   
+                 $highAverage = 0;
+                 $selectedCluster = 0;
+                  for($i = 0; $i <= 4; $i++) { 
+                    if(!empty(${'result_cluster_'.$i})) { 
+                      $average = 0;
+                      $mark = 'N/A';
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[0]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[2]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[4]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+                      
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[1]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[3]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+
+                      foreach (${'result_cluster_'.$i} as $key => $value) {
+                        if($value->course_id == ${'nearest_courses_in_'.$i}[5]->course_id) { $mark =  $value->mark; $average+= $value->mark; break; 
+                        }
+                      }
+                        
+                       
+
+                      $averagePerCluster = $average/6.0;
+                      if($highAverage < $averagePerCluster) {
+                        $highAverage = $averagePerCluster;
+                        $selectedCluster = $i;
+                      }
+                    } 
+                  } 
+
+                  
+                ?>
+
+                <table class="table table-bordered table-striped table-hover" id="simple">
+                  <thead>
+                    <tr>
+                      <th>Judul Skripsi</th>
+                      <th>Mata Kuliah Terkait</th>
+                      <th>Rerata Nilai</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <?php foreach (${'cluster_member_mark_'.$selectedCluster} as $key => $value) { 
+                      //print_r($value);
+                      ?>
+                    <tr>
+                      <td><?php echo $value->title; ?></td>
+                      <td ><?php echo $value->cname1.', '.$value->cname2.', '.$value->cname3; ?></td>
+                      <td><?php echo number_format(($value->nilai1+$value->nilai2+$value->nilai3)/ 3.0, 2); ?></td>
+                    </tr>
+                    <?php } ?>
+                  </tbody>
+                </table>
+              </div>
+
+            <?php } ?>
+
+              <div class="row" id="divadvanced" style="display: none;" >
                 <?php   
                   for($i = 0; $i <= 4; $i++) { 
                   if(!empty(${'result_cluster_'.$i})) { ?>
@@ -105,7 +217,7 @@
                           </tfoot>                          
                         </table>
 
-                        <div class="card card-primary collapsed-card">
+            <div class="card card-primary collapsed-card">
               <div class="card-header">
                 <h3 class="card-title">Cluster Member &amp; Student Grades</h3>
 
@@ -159,7 +271,7 @@
                 <?php } ?>
 
 
-                <?php if(!empty($result0)) { 
+                <?php  /* if(!empty($result0)) { 
                         //print_r($result1);
                         ?>
                         <div class="col-lg-12">
@@ -339,46 +451,13 @@
                       </div>
                     </div>
                       </div>
-                       <?php } ?>
+                       <?php } ?> */ ?>
 
                 <div class="col-lg-12">
                 
-                  <form method="post" action="<?php echo base_url('thesis/recommender'); ?>" enctype="multipart/form-data">
-                    <div class="card card-primary card-outline">
-                      <div class="card-body">
-                        <?php if(empty($nilai) &&  empty($clusterinfo)) { ?>
-                        <p class="card-text"> To begin, please provide your <strong>transcript</strong> first in order to give accurate and better recommendations for your thesis topic.
-                          
-                        </p>
-                        <div class="form-group">
-                          <label for="transcript_file">Transcript file</label>
-                          <div class="input-group">
-                            <div class="custom-file">
-                              <input type="file" class="custom-file-input" name="transcript_file" id="transcript_file">
-                              <label class="custom-file-label" for="transcript_file">Choose file</label>
-                            </div>
-                            <div class="input-group-append">
-                              <span class="input-group-text">Upload</span>
-                            </div>
-                          </div>
-                        </div>
-                       <?php } ?> 
+                  
 
                         
-
-                       
-
-                        <?php if(!empty($nilai)) { ?>
-                        <div class="form-group">
-                          <label>Choose 3 Courses</label>
-                          <select class="select2bs4" name="courses[]" multiple="multiple" data-placeholder="Select three courses"
-                                  style="width: 100%;">
-                            <?php foreach ($nilai as $key => $value) { ?>
-                              <option value="<?php echo $value['encoding']; ?>"><?php echo $value['nama'].' ('.$value['nilai'].')'; ?></option>
-                            <?php } ?>
-                          </select>
-                        </div>
-                      <?php } ?>
 
                       <?php if(!empty($clusterinfo)) { ?>
                         <div class="callout callout-info">
@@ -411,22 +490,7 @@
                         </table>
                       <?php } ?>
                       </div>
-                      <div class="card-footer">
-                        <div class="row">
-                          <?php if(empty($nilai) && empty($clusterinfo)) { ?>
-                          <button type="submit" name="btnsubmit" value="submit" class="btn btn-primary">Submit</button>
-                          <?php } ?>
-
-                          <?php if(!empty($clusterinfo)) { ?>
-                          <a href="<?php echo base_url('thesis/recommender'); ?>"  class="btn btn-primary">Start Over</a>
-                          <?php } ?>
-
-
-                          <?php if(!empty($nilai)) { ?>
-                          <button type="submit" name="btnconfirm" value="submit" class="btn btn-primary">Confirm Courses</button>
-                          <?php } ?>
-                        </div>
-                      </div>
+                      
                     </div>
                   </form>
                 </div>

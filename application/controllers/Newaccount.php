@@ -21,6 +21,7 @@ class Newaccount extends CI_Controller {
 		if($this->input->post('btnsubmit')) {
 			$this->load->library('form_validation');
 			$this->form_validation->set_rules('first_name', 'Nama Depan', 'required', array('required' => '%s wajib diisi.'));
+			$this->form_validation->set_rules('nrp', 'NRP', 'required', array('required' => '%s wajib diisi.'));
 			$this->form_validation->set_rules('last_name', 'Nama Belakang', 'required', array('required' => '%s wajib diisi.'));
 			$this->form_validation->set_rules('password', 'Password', 'required',
                         array('required' => '%s wajib diisi.')

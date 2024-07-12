@@ -12,6 +12,14 @@
   <!-- overlayScrollbars -->
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/overlayScrollbars/css/OverlayScrollbars.min.css'); ?>">
 
+<!-- summernote -->
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/summernote/summernote-bs4.min.css'); ?>">
+
+  <!-- DataTables -->
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-responsive/css/responsive.bootstrap4.min.css'); ?>">
+  <link rel="stylesheet" href="<?php echo base_url('dist/plugins/datatables-buttons/css/buttons.bootstrap4.min.css'); ?>">
+
   <!-- SweetAlert2 -->
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css'); ?>">
   <!-- Theme style -->
@@ -61,18 +69,20 @@
     <!-- Brand Logo -->
     <a href="<?php echo base_url('dashboard'); ?>" class="brand-link">
       <img src="<?php echo base_url('dist/img/AdminLTELogo.png'); ?>" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light"><?php echo $setting->web_name; ?></span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-        <div class="image">
-          <img src="<?php echo base_url('dist/img/user2-160x160.jpg'); ?>" class="img-circle elevation-2" alt="User Image">
+        <div class="image" id="sidebarpropic" style="width:2.1em; height: 2.1em; border-radius: 50%; margin-left: auto; margin-right: auto;
+                background: url('<?php echo base_url('uploads/avatars/'.$userjson->avatar_image_filename); ?>');  background-size: cover;
+    background-repeat: no-repeat;  " >
+          
         </div>
-        <div class="info">
-          <a href="#" class="d-block">Alexander Pierce</a>
+        <div class="info" style="flex-grow: 1;">
+          <a href="<?php echo base_url('myprofile'); ?>" class="d-block"><?php echo $userjson->first_name.' '.$userjson->last_name; ?></a>
         </div>
       </div>
 
@@ -102,11 +112,88 @@
             </a>
             
           </li>
+
+          <li class="nav-item menu-is-opening menu-open">
+            <a href="#" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-tree"></i>
+              <p>
+                Skripsi
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="display: block;">
+              <?php if($userjson->user_type =='student') { ?>
+              <li class="nav-item">
+                <a href="<?php echo base_url('tugasakhir'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir' && !$this->uri->segment(2)) { echo 'active'; } ?>">
+                  <i class="nav-icon far fa-circle nav-icon"></i>
+                  <p>
+                    Data Skripsi
+                  </p>
+                </a>
+              </li>
+              <?php } ?>
+
+              <?php if($userjson->user_type =='lecturer') { ?>
+              <li class="nav-item">
+                <a href="<?php echo base_url('tugasakhir/bimbinganku'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir' && $this->uri->segment(2) == 'bimbinganku') { echo 'active'; } ?>">
+                  <i class="nav-icon far fa-circle nav-icon"></i>
+                  <p>
+                    Bimbinganku
+                  </p>
+                </a>
+              </li>
+              <?php } ?>
+
+              <?php if($userjson->user_type =='student') { ?>
+              <li class="nav-item">
+                <a href="<?php echo base_url('tugasakhir/logbimbingan'); ?>" class="nav-link <?php if($this->uri->segment(2) == 'logbimbingan') { echo 'active'; } ?>">
+                  <i class="nav-icon far fa-circle nav-icon"></i>
+                  <p>
+                    Log Bimbingan
+                  </p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="<?php echo base_url('tugasakhir/weeklyplanner'); ?>" class="nav-link <?php if($this->uri->segment(2) == 'weeklyplanner') { echo 'active'; } ?>">
+                  <i class="nav-icon far fa-circle nav-icon"></i>
+                  <p>
+                    Weekly Planner
+                  </p>
+                </a>
+              </li>
+              
+              <?php } ?>
+            </ul>
+          </li>
+
+          
+
           <li class="nav-item">
-            <a href="<?php echo base_url('tugasakhir'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir') { echo 'active'; } ?>">
+            <a href="<?php echo base_url('thesis/recommender'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'thesis') { echo 'active'; } ?>">
               <i class="nav-icon fas fa-th"></i>
               <p>
-                Data Tugas Akhir
+                Sistem Rekomendasi
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="<?php echo base_url('diskusi/home'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'diskusi') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-comments"></i>
+              <p>
+                Ruang Diskusi
+              </p>
+            </a>
+          </li>
+
+          
+
+          <li class="nav-item" style="    border-top: 1px solid #4f5962">
+            <a href="<?php echo base_url('dashboard/signout'); ?>" class="nav-link">
+              <i class="nav-icon fas fa-door-open"></i>
+              <p>
+                Sign Out
               </p>
             </a>
           </li>

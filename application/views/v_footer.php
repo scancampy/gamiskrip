@@ -23,20 +23,29 @@
 <!-- PAGE PLUGINS -->
 
 <script src="<?php echo base_url('dist/plugins/inputmask/jquery.inputmask.min.js'); ?>"></script>
-<!-- jQuery Mapael -->
-<script src="<?php echo base_url('dist/plugins/jquery-mousewheel/jquery.mousewheel.js'); ?>"></script>
-<script src="<?php echo base_url('dist/plugins/raphael/raphael.min.js'); ?>"></script>
-<script src="<?php echo base_url('dist/plugins/jquery-mapael/jquery.mapael.min.js'); ?>"></script>
-<script src="<?php echo base_url('dist/plugins/jquery-mapael/maps/usa_states.min.js'); ?>"></script>
+
 <!-- ChartJS -->
 <script src="<?php echo base_url('dist/plugins/chart.js/Chart.min.js'); ?>"></script>
+
+<!-- DataTables  & Plugins -->
+<script src="<?php echo base_url('dist/plugins/datatables/jquery.dataTables.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-responsive/js/dataTables.responsive.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-responsive/js/responsive.bootstrap4.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-buttons/js/dataTables.buttons.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-buttons/js/buttons.bootstrap4.min.js'); ?>"></script>
+
+<script src="<?php echo base_url('dist/plugins/datatables-buttons/js/buttons.html5.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-buttons/js/buttons.print.min.js'); ?>"></script>
+<script src="<?php echo base_url('dist/plugins/datatables-buttons/js/buttons.colVis.min.js'); ?>"></script>
+<!-- Summernote -->
+<script src="<?php echo base_url('dist/plugins/summernote/summernote-bs4.min.js'); ?>"></script>
+<!-- AdminLTE App -->
 
 <!-- SweetAlert2 -->
 <script src="<?php echo base_url('dist/plugins/sweetalert2/sweetalert2.min.js'); ?>"></script>
 
 <!-- AdminLTE for demo purposes -->
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="<?php echo base_url('dist/js/pages/dashboard2.js'); ?>"></script>
 
 <?php if($js) { ?>
 <script type="text/javascript">

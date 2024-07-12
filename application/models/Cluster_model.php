@@ -2,14 +2,35 @@
 class Cluster_model extends CI_Model {
 
     public function isCourseExist($code, $name) {
-        $this->db->like('course_name', $name);
+        $q = $this->db->get_where('course', array('course_id' => $code));
+
+        if($q->num_rows() >0) {
+            return $q->row();
+        } else {
+            // cek di table kestaraan
+            $q = $this->db->get_where('kesetaraan_course', array('kesetaraan_id' => $code));
+
+            if($q->num_rows() > 0) {
+                $hq = $q->row();
+                $p = $this->db->get_where('course', array('course_id' => $hq->course_id));
+
+                if($p->num_rows() >0) {
+                    return $p->row();
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        /*$this->db->like('course_name', $name);
         $this->db->or_where('course_id', $code);  
         $q = $this->db->get('course');
         if($q->num_rows() > 0) {
                 return $q->row();
         } else {
                 return false;
-        }
+        }*/
     }
 
     public function getNilaiFromCourseList($nearestCourses, $nilaiValues) {
@@ -21,7 +42,22 @@ class Cluster_model extends CI_Model {
                 if($valuen['kode'] == $value->course_id) {
                     $value->mark = $valuen['nilai'];
                     $nilai[] = $value;
-                }            
+                } else {
+                    //cari di kesetaraannya
+                     $q = $this->db->get_where('kesetaraan_course', array('course_id' => $value->course_id));
+                     if($q->num_rows() >0 ) {
+                        $hq = $q->result();
+
+                        foreach ($hq as $keyhq => $valuehq) {
+                            if($valuen['kode'] == $valuehq->kesetaraan_id) {
+                                $value->mark = $valuen['nilai'];
+                                $nilai[] = $value; 
+                                break;  
+                            }
+                        }
+                        
+                     }
+                }           
             }
         }
 

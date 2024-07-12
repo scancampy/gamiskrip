@@ -8,9 +8,9 @@ class User_model extends CI_Model {
         public $last_name;
         public $email;
 
-        public function getUser($username =null, $where= null) {
-                if($username != null) {
-                        $this->db->where('username', $username);
+        public function getUser($email =null, $where= null) {
+                if($email != null) {
+                        $this->db->where('email', $email);
                 }
 
                 if($where != null) {
@@ -18,7 +18,7 @@ class User_model extends CI_Model {
                 }
                 $query = $this->db->get('user');
                 
-                return $query->result();
+                return $query->row();
         }
 
         public function do_login() {
@@ -45,8 +45,22 @@ class User_model extends CI_Model {
                 $this->password = password_hash($this->input->post('password'), PASSWORD_DEFAULT);
                 $this->user_type = 'student';
                 $this->last_login = null;
+                // get random avatar
+                $this->db->order_by('RAND()'); 
+                $q = $this->db->get('avatar_images', 1);
+                $hq = $q->row();
+                $this->avatar_image_filename = $hq->avatar;
 
                 $this->db->insert('user',$this);
+
+                $data = array(
+                                'nrp'           => trim($this->input->post('nrp')),
+
+                                'user_id'       => $this->db->insert_id(),
+                                'fullname'      => trim($this->input->post('first_name')).' '.trim($this->input->post('last_name'))
+                        );
+                $this->db->insert('student', $data);
+
                 return ($this->db->affected_rows() != 1) ? false : true;
         }
 
@@ -80,6 +94,22 @@ class User_model extends CI_Model {
         public function del($username) {
                 $this->db->where('username', $username);
                 $this->db->delete('user');
+        }
+
+        public function getAvatars() {
+                $q = $this->db->get_where('avatar_images');
+                return $q->result();
+        }
+
+        public function getAvatar($id) {
+                $q = $this->db->get_where('avatar_images', array('id' => $id));
+                return $q->row();
+        }
+
+        public function updateAvatars($user_id, $filename) {
+                $data = array('avatar_image_filename' => $filename);
+                $this->db->where('id', $user_id);
+                $this->db->update('user', $data);
         }
 
 }

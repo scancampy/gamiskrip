@@ -5,12 +5,12 @@
       <div class="container">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Tugas Akhir</h1>
+            <h1 class="m-0">Validasi Tugas Akhir</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Tugas Akhir</li>
+              <li class="breadcrumb-item active">Validasi Tugas Akhir</li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -21,13 +21,6 @@
     <!-- Main content -->
     <div class="content">
       <div class="container">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="text-right">
-              <a href="" class="btn btn-primary"  data-toggle="modal" data-target="#modal-default">Tambah Tugas Akhir</a>
-            </div>
-          </div>
-        </div>
         <div class="row mt-3" >
           <div class="col-lg-12">
 
@@ -38,12 +31,13 @@
                   <thead>
                     <tr>
                       <th>Judul Tugas Akhir</th>
+                      <th>Mahasiswa</th>
                       <th>Dosbing 1</th>
                       <th>Dosbing 2</th>
                       <th>Tanggal ST</th>
-                      <th>Masa Berlaku</th>
                       <th>Link Proposal</th>
                       <th style="width: 40px">Status</th>
+                      <th >Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -51,19 +45,18 @@
                       foreach ($tugasakhir as $key => $value) { ?>
                     <tr>
                       <td><?php echo $value->judul; ?></td>
+                      <td><?php echo $value->fullname.' ('.$value->nrp.')'; ?></td>
                       <td><?php echo $value->f1; ?></td>
                       <td><?php echo $value->f2; ?></td>
                       <td><?php echo strftime("%d %B %Y", strtotime($value->tanggal_st)); ?></td>
-                      <td><?php echo strftime("%d %B %Y", strtotime($value->tanggal_akhir_st)); ?></td>
                       <td><a href="<?php echo $value->proposal_url;  ?>" target="_blank">Lihat</a></td>
-                      <td style="width: 40px"><?php if($value->is_active == 0) { echo '<span class="badge badge-secondary">Menuggu Approval Dosbing</span>'; } else { echo '<span class="badge badge-primary">Aktif</span>'; } ?></td>
+                      <td style="width: 40px"><?php if($value->is_active == 0) { echo '<span class="badge badge-secondary">Menuggu Approval Dosbing</span>'; 
+                        
+                    } else { echo '<span class="badge badge-primary">Aktif</span>'; } ?></td>
+                    <td><?php if($value->is_active == 0) {  echo '<a href="'.base_url('tugasakhir/validasi/'.$value->id).'" onclick="return confirm(\"Apakah anda yakin untuk validasi?\");" class="btn btn-primary btn-xs">Validasi</a>'; } ?></td>
                     </tr>    
                      <?php }
-                      } else { ?>
-                    <tr>
-                      <td colspan="7" class="text-center">Belum punya judul? cobalah <a href="#">sistem rekomendasi topik</a> kami.</td>
-                    </tr>
-                    <?php } ?>
+                      }  ?>
                   </tbody>
                 </table>
               </div>

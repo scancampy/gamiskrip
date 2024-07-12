@@ -20,13 +20,13 @@ class Student_model extends CI_Model {
         $this->db->update('user', array('player_style' => $user_type_max));
     }
 
-    public function getStudent($nrp = null, $username = null, $where = null) {
+    public function getStudent($nrp = null, $user_id = null, $where = null) {
         if($nrp!=null) {
             $this->db->where('nrp', $nrp);
         }
 
-        if($username!=null) {
-            $this->db->where('username', $username);
+        if($user_id!=null) {
+            $this->db->where('user_id', $user_id);
         }
 
         if($where!=null) {

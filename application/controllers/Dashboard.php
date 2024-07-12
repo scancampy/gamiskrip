@@ -19,11 +19,15 @@ class Dashboard extends CI_Controller {
 		$data['js'] = '';
 		$user = $this->input->cookie('user');
 		$userjson = json_decode($user);
+		$data['setting'] = $this->Setting_model->getSetting();
+		
 		
 		// check if admin
 		if($userjson->user_type!='admin') {
 			redirect('notfound');
 		}
+
+		$data['userjson'] = $userjson;
 
 		$data['cluster'] = $this->Cluster_model->getClusterId($id);
 		$data['lecturer'] = $this->Lecturer_model->getLecturer(null, null,null, 'name', 'asc');
@@ -79,6 +83,9 @@ class Dashboard extends CI_Controller {
 		if($userjson->user_type!='student') {
 			redirect('notfound');
 		}
+		$data['setting'] = $this->Setting_model->getSetting();
+		
+		$data['userjson'] = $userjson;
 
 		// check if not yet complete the questionnaire
 		/*if(empty($userjson->player_style)) {
@@ -130,7 +137,17 @@ class Dashboard extends CI_Controller {
 			redirect('notfound');
 		}
 
-		echo 'admin';
+		$data['setting'] = $this->Setting_model->getSetting();		
+		$data['userjson'] = $userjson;
+
+		$this->load->view('v_header', $data);
+		$this->load->view('v_dashboard_admin', $data);
+		$this->load->view('v_footer', $data);
+	}
+
+	public function signout() {
+		delete_cookie('user');
+		redirect(''); 
 	}
 
 	public function lecturer() {
@@ -138,13 +155,19 @@ class Dashboard extends CI_Controller {
 		$data['js'] = '';
 		$user = $this->input->cookie('user');
 		$userjson = json_decode($user);
+
+		$data['setting'] = $this->Setting_model->getSetting();
+		
+		$data['userjson'] = $userjson;
 		
 		// check if lecturer
 		if($userjson->user_type!='lecturer') {
 			redirect('notfound');
 		}
 
-		echo 'lecturer';
+		$this->load->view('v_header', $data);
+		$this->load->view('v_dashboard_lecturer', $data);
+		$this->load->view('v_footer', $data);
 	}
 	
 	public function index()

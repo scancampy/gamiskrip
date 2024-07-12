@@ -86,11 +86,16 @@ class Thesis extends CI_Controller {
 		$data['js'] = '';
 		$user = $this->input->cookie('user');
 		$userjson = json_decode($user);
+		$data['fileread'] = false;
+		$data['setting'] = $this->Setting_model->getSetting();
+		
 		
 		// check if student
 		if($userjson->user_type!='student') {
 			redirect('notfound');
 		}
+
+		$data['userjson'] = $userjson;
 
 		if($this->input->post('btnconfirm')) {
 			$inputCourses = $this->input->post('courses');
@@ -167,13 +172,18 @@ class Thesis extends CI_Controller {
 					  $datax = array(
 					        'kode' => $line[1],
 					        'nama' => $line[2],
-					        'nilai' => $this->_convert_nisbi($line[5]),
+					        'nilai' => $this->_convert_nisbi($line[3]),
 					        'encoding' => $courseexits->encoding_value
 					  );
 					  $nilai[] = $datax;
 					}
 				}
 
+				$data['fileread'] = true;
+
+				//print_r($nilai);
+
+				//die();
 
 
 				// Extract the 'nilai' values from the array for sorting
@@ -279,17 +289,26 @@ class Thesis extends CI_Controller {
 	      timer: 3000
 	    });'; 
 
-	    // bs init
+	    // show hide simple advanced button
 	    $data['js'] .= '
-	      bsCustomFileInput.init();
-	    ';
+	    	$("#btnsimple").on("click",function() {
+	    		console.log("cek");
+	    		$("#divsimple").show();
+	    		$("#divadvanced").hide();
+	    		$("#btnsimple").removeClass("btn-default");
+	    		$("#btnsimple").addClass("btn-primary");
+	    		$("#btnadvanced").removeClass("btn-primary");
+	    		$("#btnadvanced").addClass("btn-default");
+	    	});
 
-	    // select2 init
-	    $data['js'] .= '
-	    	//Initialize Select2 Elements
-		    $(".select2bs4").select2({
-		      theme: "bootstrap4"
-		    });
+	    	$("#btnadvanced").on("click",function() {
+	    		$("#divsimple").hide();
+	    		$("#divadvanced").show();
+	    		$("#btnsimple").removeClass("btn-primary");
+	    		$("#btnsimple").addClass("btn-default");
+	    		$("#btnadvanced").removeClass("btn-default");
+	    		$("#btnadvanced").addClass("btn-primary");
+	    	});
 	    ';
 
 	    // datatable
@@ -302,6 +321,17 @@ class Thesis extends CI_Controller {
 	      "info": true,
 	      "autoWidth": false,
 	      "responsive": true,
+	    });
+
+	    $("#simple").DataTable({
+	      "paging": true,
+	      "lengthChange": false,
+	      "searching": false,
+	      "ordering": true,
+	      "info": true,
+	      "autoWidth": false,
+	      "responsive": true,
+	      "order": [[2, "desc"]]
 	    });
 
 	    $("#exampleX1").DataTable({
