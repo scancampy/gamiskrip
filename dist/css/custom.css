@@ -89,5 +89,50 @@ form .buttons button {
   border-radius: 3px;
 }
 
+/* Base styles for <pre> tag */
+pre {
+    background-color: #2d2d2d; /* Dark background */
+    padding: 16px;            /* Padding around the code */
+    border-radius: 5px;       /* Rounded corners */
+    overflow: auto;           /* Scrollable if content overflows */
+    color: #ccc;              /* Default text color */
+    font-size: 14px;          /* Font size */
+    line-height: 1.5;         /* Line height */
+    white-space: pre-wrap;    /* Preserve whitespace and wrap lines */
+}
+
+/* Base styles for <code> tag */
+code {
+    font-family: 'Courier New', Courier, monospace; /* Monospaced font */
+}
+
+/* Additional styles for syntax highlighting */
+pre code .comment { color: #999999; font-style: italic; }
+pre code .keyword { color: #cc99cd; }
+pre code .string  { color: #7ec699; }
+pre code .number  { color: #f99157; }
+pre code .operator { color: #66cccc; }
+pre code .function { color: #f99157; }
+pre code .variable { color: #f2777a; }
+
+/* Optional: Add a box shadow for some depth */
+pre {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional: Make it responsive */
+@media (max-width: 600px) {
+    pre {
+        padding: 8px; /* Reduce padding on smaller screens */
+    }
+}
+
+.content-wrapper {
+  background: url('/images/assets/rm380-10.jpg') !important;
+  background-size: cover !important; /* Ensures the image covers the whole div */
+  background-position: center !important; /* Centers the background image */
+  background-repeat: repeat-y !important;
+}
+
 
 

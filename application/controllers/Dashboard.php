@@ -12,6 +12,9 @@ class Dashboard extends CI_Controller {
 			// Redirect to default controller
 			redirect('');
 		}
+		if(oboarding_check()) {
+			$this->session->set_flashdata('showonboarding', 'true');	
+		}
 	}
 
 	public function edit_cluster($id) {
@@ -86,6 +89,13 @@ class Dashboard extends CI_Controller {
 		$data['setting'] = $this->Setting_model->getSetting();
 		
 		$data['userjson'] = $userjson;
+		if($this->Quest_model->checkFirstQuest($userjson->id)) {			
+			$this->Quest_model->generateNewQuest($userjson->id);	
+		}
+		
+		$data['quest'] = $this->Quest_model->getCurrentUserQuest($userjson->id);
+		$data['acts'] = $this->Setting_model->getActs();
+		$data['thesis'] = $this->Thesis_model->getStudentThesis(null, $userjson->id, "is_active = 1");
 
 		// check if not yet complete the questionnaire
 		/*if(empty($userjson->player_style)) {

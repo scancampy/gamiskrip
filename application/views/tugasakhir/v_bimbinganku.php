@@ -51,7 +51,8 @@
                       <td style="width: 40px"><?php if($value->is_active == 0) { echo '<span class="badge badge-secondary">Menunggu Approval Dosbing</span>'; } else if($value->is_active ==1 && strtotime($value->tanggal_akhir_st) > strtotime(date('Y-m-d')) ) { echo '<span class="badge badge-primary">Aktif</span>'; } else {
                         echo '<span class="badge badge-danger">ST berakhir</span>';
                       } ?></td>
-                      <td><a href="" data-toggle="modal" data-target="#modal-default" class="btn btn-xs btn-primary mr-1 btndetilbimbingan" targetid="<?php echo $value->id; ?>">Detail</a><a href="<?php echo base_url('tugasakhir/logbimbinganku/'.$value->id); ?>" class="btn btn-xs btn-warning">Log Bimbingan</a></td>
+                      <td>
+                        <a href="<?php echo base_url('tugasakhir/student_progress/'.$value->student_id); ?>" class="btn btn-xs btn-primary mr-1 btndetilbimbingan">Progress</a><a href="<?php echo base_url('tugasakhir/logbimbinganku/'.$value->id); ?>" class="btn btn-xs btn-warning">Log Bimbingan</a> <?php echo $jumlahlog[$key]; ?></td>
                     </tr>    
                      <?php }
                       } ?>

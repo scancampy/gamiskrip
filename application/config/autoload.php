@@ -89,7 +89,7 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url','cookie');
+$autoload['helper'] = array('url','cookie', 'bbcode_helper', 'emoji_helper', 'text', 'chat_helper', 'onboarding_helper');
 
 /*
 | -------------------------------------------------------------------
@@ -132,4 +132,4 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('User_model', 'Survey_model', 'Student_model', 'Thesis_model', 'Lecturer_model','Cluster_model', 'Setting_model', 'Perihal_logs_model', 'Diskusi_model');
+$autoload['model'] = array('User_model', 'Survey_model', 'Student_model', 'Thesis_model', 'Lecturer_model','Cluster_model', 'Setting_model', 'Perihal_logs_model', 'Diskusi_model', 'Clan_model', 'Quest_model', 'Timeline_model', 'Journey_model');

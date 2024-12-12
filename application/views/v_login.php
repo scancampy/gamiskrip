@@ -13,13 +13,22 @@
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/icheck-bootstrap/icheck-bootstrap.min.css'); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url('dist/css/adminlte.min.css'); ?>">
+
+  <style type="text/css">
+    .login-page {
+      background: url('/images/assets/rm380-10.jpg') !important;
+      background-size: cover !important; /* Ensures the image covers the whole div */
+      background-position: center !important; /* Centers the background image */
+      background-repeat: no-repeat !important;
+    }
+  </style>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <!-- /.login-logo -->
   <div class="card card-outline card-primary">
     <div class="card-header text-center">
-      <a href="<?php echo base_url(); ?>" class="h1"><b>Gamiskrip</b></a>
+      <a href="<?php echo base_url(); ?>" class="h1"><img class="img-fluid" src="<?php echo base_url('images/assets/gamiskriplogo.png'); ?>"/></a>
     </div>
     <div class="card-body">
       <?php 
@@ -67,11 +76,12 @@
         </div>
       </form>
 
-      
+      <?php /*
       <p class="mb-1">
         <a href="#">Lupa password</a><br/>
         <a href="<?php echo base_url('newaccount'); ?>">Buat Akun</a>
       </p>
+      */ ?>
       </div>
     <!-- /.card-body -->
   </div>

@@ -23,9 +23,45 @@
 
       <div class="container">
         <div class="row">
-          <div class="col-lg-12">
-            <?php echo $infobox; ?>
+         <div class="col-lg-12">
+            <div class="card card-primary card-outline">
+              <div class="card-header">
+                <h3 class="card-title">Tugas Akhir</h3>
+              </div>
+      <!-- /.card-header -->
+              <div class="card-body" style="display: block;">
+                <dl>
+                  <dt><?php echo $tugasakhir[0]->judul; ?></dt>
+                  <dd><?php echo $tugasakhir[0]->f1; ?> &amp; <?php echo $tugasakhir[0]->f2; ?></dd>
+                </dl>
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="card card-primary">
+                <div class="card-header">
+                  <h3 class="card-title">Weekly Planner</h3>
+
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <div class="chart"><div class="chartjs-size-monitor"><div class="chartjs-size-monitor-expand"><div class=""></div></div><div class="chartjs-size-monitor-shrink"><div class=""></div></div></div>
+                    <canvas id="stackedBarChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%; display: block; width: 532px;" width="1064" height="500" class="chartjs-render-monitor"></canvas>
+                  </div>
+                </div>
+                <!-- /.card-body -->
+              </div>
+            </div>
         </div>
 
         <div class="row">
@@ -81,39 +117,45 @@
 
                         $renderweeklyplan = '';
 
-                        foreach ($weeklyplan as $key => $value) {
-                          if($value->start_week == $weekstart->format('Y-m-d') && $value->end_week == $weekend->format('Y-m-d')) { 
-                            $jumlahplan++;
-                            $disablecheck = '';
 
-                            if($value->is_done == true) {
-                              $disablecheck = ' disabled checked';
-                            }
+                        if($weeklyplan != false) {
+                          foreach ($weeklyplan as $key => $value) {
+                            if($value->start_week == $weekstart->format('Y-m-d') && $value->end_week == $weekend->format('Y-m-d')) { 
+                              $jumlahplan++;
+                              $disablecheck = '';
 
-                            $renderweeklyplan .= '<div class="row justify-content-between pb-2 pt-2" style="border-bottom: 1px solid lightgray;">
-                          <span>'; 
+                              if($value->is_done == true) {
+                                $disablecheck = ' disabled checked';
+                              }
 
-                            if($value->is_done == false) {
-                              $renderweeklyplan .= '<a href="" data-toggle="modal" id="plandisplay-'.$value->id.'" data-target="#modal-edit" class="editplan" idplan="'.$value->id.'">'.$value->plan.'</a></span><div>';
-                            } else {
-                              $renderweeklyplan .= $value->plan.'</span><div>';
-                            }
-                          
+                              $renderweeklyplan .= '<div class="row justify-content-between pb-2 pt-2" style="border-bottom: 1px solid lightgray;">
+                            <span>'; 
 
-                            if($disablecheck == '') {
-                              $renderweeklyplan .= '<i class="fas fa-trash text-muted plandel" idplan="'.$value->id.'" ></i>&nbsp;&nbsp;';
-                            }
+                              if($value->is_done == false) {
+                                $renderweeklyplan .= '<a href="" data-toggle="modal" id="plandisplay-'.$value->id.'" data-target="#modal-edit" class="editplan" idplan="'.$value->id.'">'.$value->plan.'</a></span><div>';
+                              } else {
+                                $renderweeklyplan .= $value->plan.'</span><div>';
+                              }
                             
-                            $renderweeklyplan .= '<input type="checkbox" '.$disablecheck.' class="checkplan" idplan="'.$value->id.'"/> 
-                            </div>
-                          </div>';
 
-                            if($value->is_done == 1) {
-                              $jumlahplanselesai++;
+                              if($disablecheck == '') {
+                                $renderweeklyplan .= '<i class="fas fa-trash text-muted plandel" idplan="'.$value->id.'" ></i>&nbsp;&nbsp;';
+                              }
+                              
+                              $renderweeklyplan .= '<input type="checkbox" '.$disablecheck.' class="checkplan" idplan="'.$value->id.'"/> 
+                              </div>
+                            </div>';
+
+                              if($value->is_done == 1) {
+                                $jumlahplanselesai++;
+                              }
                             }
                           }
                         } ?>
-                      <?php echo $jumlahplanselesai; ?>/<?php echo $jumlahplan; ?> Rencana kegiatan selesai</span>
+                      <?php echo $jumlahplanselesai; ?>/<?php echo $jumlahplan; ?> Rencana kegiatan selesai
+                        <input type="hidden" id="jumlahplan_<?php echo $pekan; ?>" value="<?php echo $jumlahplan; ?>" >
+                        <input type="hidden" id="jumlahplanselesai_<?php echo $pekan; ?>" value="<?php echo $jumlahplanselesai; ?>" >
+                        </span>
                       </a>
                     </div>
                     <div class="align-middle">
@@ -143,6 +185,8 @@
             
           <?php $pekan++; $dateTime->modify('+1 day'); } ?>
           </div>
+
+          <input type="hidden" id="jumlahpekan" value="<?php echo $pekan; ?>">
         </div>
 
         </div>   
@@ -212,3 +256,42 @@
     <!-- /.modal-dialog -->
   </div>
   <!-- /.modal -->
+
+
+  <!-- The Modal -->
+<div class="modal fade" id="onboarding-dialog" tabindex="-1" role="dialog" aria-labelledby="onboarding-dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Gamiskrip Weekly Planner</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <div class="row">
+          <!-- Image on the Left -->
+          <div class="col-md-2">
+            <img src="<?php echo base_url('images/assets/avatar.png'); ?>" class="img-fluid" alt="Image description">
+          </div>
+          <!-- Text on the Right -->
+          <div class="col-md-10 d-flex align-items-center">
+            <p class="mb-0 onboarding-content" id="onboarding-content-1" >Pakai weekly plan untuk membuat rencana mingguan kamu. Dengan membuat rencana mingguan, maka pengerjaan skripsimu lebih teratur.</p>
+            <p class="mb-0 onboarding-content" id="onboarding-content-2" style="display:none;"  >Setelah rencana dibuat, jangan lupa mengerjakan sesuai rencana tersebut. Jika sudah selesai, maka kamu bisa memberi <strong>centang</strong> pada tugas yang kamu tulis di rencana mingguanmu itu.</p>
+            <p class="mb-0 onboarding-content" id="onboarding-content-3" style="display:none;" >Dengan selalu mencatat dan melaksanakan rencana mingguan, maka kamu telah menciptakan habit yang baik agar skripsimu segera kelar.<br/>Have fun!</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer with "Next" Button -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="onboarding-next-button">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

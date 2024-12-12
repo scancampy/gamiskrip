@@ -1,23 +1,23 @@
 <?php
 class Student_model extends CI_Model {
 
-    public function updateUserType($username, $scores) {
+    public function updateUserType($user_id, $scores) {
         $max = 0;
         $user_type_max = null;
 
         foreach ($scores as $key => $value) {
-                $this->db->where('username', $username);
-                $this->db->update('student', array($key => $value));
+                $this->db->where('user_id', $user_id);
+                $this->db->update('student', array(str_replace(' ', '_', $key) => $value));
 
                 if($max < $value) {
                         $max = $value;
-                        $user_type_max = $key;
+                        $user_type_max = str_replace(' ', '_', $key);
                 }
         }
 
         // update user
-        $this->db->where('username', $username);
-        $this->db->update('user', array('player_style' => $user_type_max));
+        $this->db->where('user_id', $user_id);
+        $this->db->update('student', array('player_style' => $user_type_max));
     }
 
     public function getStudent($nrp = null, $user_id = null, $where = null) {

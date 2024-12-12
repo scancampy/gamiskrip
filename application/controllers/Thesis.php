@@ -53,10 +53,12 @@ class Thesis extends CI_Controller {
 	        $similarities[] = array('member' => $member, 'similarity' => $similarity);
 	    }
 
-	    // Sort the similarities in descending order
 	    usort($similarities, function($a, $b) {
-	        return $b['similarity'] <=> $a['similarity'];
-	    });
+		    if ($a['similarity'] == $b['similarity']) {
+		        return 0;
+		    }
+		    return ($a['similarity'] < $b['similarity']) ? 1 : -1;
+		});
 
 	    return $similarities;
 	}

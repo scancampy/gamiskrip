@@ -7,6 +7,8 @@ class Welcome extends CI_Controller {
 	public function index()
 	{
 		$data = array();
+		$data['setting'] = $this->Setting_model->getSetting();
+		
 		//echo password_hash('password', PASSWORD_DEFAULT);
 		/*if(password_verify('password', '$2y$10$3L2Qw1hSO0HxmI2H3TQXvubOx9fU/HvtdjWS4S5I4y/0.n0EfGYFS') ) {
 			echo 'password valid';
@@ -22,7 +24,14 @@ class Welcome extends CI_Controller {
 
 				// redirect
 				if($user->user_type=='student') {
-					redirect('dashboard/student');
+					// cek if user already submit hexad questions
+					
+					if($this->Survey_model->checkUserFinishSurvey($user->id)) {
+						redirect('dashboard/student');
+					} else {
+						redirect('survey');
+					}
+					
 				} else if($user->user_type=='admin') {
 					redirect('dashboard/admin');
 				} else if($user->user_type == 'lecturer') {

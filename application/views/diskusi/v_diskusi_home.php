@@ -26,7 +26,7 @@
               <div class="col-12 text-right mb-2">
                <?php if($admin) { ?>
                 <a data-toggle="modal" id="btn_create_folder" data-target="#modal-lg" class="btn btn-primary"><i class="fas fa-folder-plus"></i> Buat Folder</a> <?php } ?>
-                <a href="<?php echo base_url('diskusi/new/'.$parent_folder_id); ?>" class="btn btn-primary"><i class="fas fa-comments"></i> Buat Diskusi</a>
+                <a href="<?php echo base_url('diskusi/baru/'.$parent_folder_id); ?>" class="btn btn-primary"><i class="fas fa-comments"></i> Buat Diskusi</a>
               </div>
             </div>
             <div class="card">
@@ -48,7 +48,7 @@
                           Tanggal
                       </th>
                       <th style="width: 10%">
-                          Post
+                          Num. of Reply
                       </th>
                   </tr>
               </thead>
@@ -73,14 +73,15 @@
                     ="fas fa-envelope-open"></i>'; } else { echo '<i class
                     ="fas fa-envelope"></i>'; } ?></td>
                     <td><a href="<?php echo base_url('diskusi/read/'.$value->id.'/'.url_title($value->thread_title)); ?>">
-                      <?php echo $value->thread_title; ?><br/>
+                      <?php echo $value->thread_title; ?> <span class="badge badge-success"><?php //echo $value->thread_type;  
+                      echo ucwords(str_replace("_", " ", str_replace("add_post_share_", "", $value->thread_type))); ?></span><br/>
                       <small>
                               <?php echo '@'.$value->first_name.' '.$value->last_name; ?>
                           </small>
                         </a>
                     </td>
                     <td><?php echo strftime("%d %b, %Y", strtotime($value->created)); ?></td>
-                    <td>0</td>
+                    <td><?php echo $num_of_reply[$key]; ?></td>
                   </tr>
                 <?php } ?>
               </tbody>
@@ -123,4 +124,42 @@
     <!-- /.modal-content -->
   </div>
   <!-- /.modal-dialog -->
+</div>
+
+<!-- The Modal -->
+<div class="modal fade" id="onboarding-dialog" tabindex="-1" role="dialog" aria-labelledby="onboarding-dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="myModalLabel">Gamiskrip Ruang Diskusi</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <div class="row">
+          <!-- Image on the Left -->
+          <div class="col-md-2">
+            <img src="<?php echo base_url('images/assets/avatar.png'); ?>" class="img-fluid" alt="Image description">
+          </div>
+          <!-- Text on the Right -->
+          <div class="col-md-10 d-flex align-items-center">
+            <p class="mb-0 onboarding-content" id="onboarding-content-1" >Ruang diskusi adalah tempat kamu untuk berdiskusi, sharing, meminta bantuan, atau sekedar say hi ke teman-teman.</p>
+            <p class="mb-0 onboarding-content" id="onboarding-content-2" style="display:none;"  >Untuk memulai diskusi, tekan tombol <strong>Buat Diskusi</strong> di ujung kanan atas.</p>
+            <p class="mb-0 onboarding-content" id="onboarding-content-3" style="display:none;" >Untuk membaca suatu diskusi, tekan salah satu judul diskusi yang ada. Kamu bahkan bisa ikutan membalas suatu diskusi yang seru.<br/>Have fun! </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer with "Next" Button -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="onboarding-next-button">Next</button>
+      </div>
+    </div>
+  </div>
 </div>

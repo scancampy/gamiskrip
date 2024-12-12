@@ -10,6 +10,11 @@ class Tugasakhir extends CI_Controller {
 			// Redirect to default controller
 			redirect('');
 		}
+
+		if(oboarding_check()) {
+		//	die();
+			$this->session->set_flashdata('showonboarding', 'true');	
+		} 
 	}
 
 	public function logbimbinganku($idskripsi) {
@@ -37,6 +42,7 @@ class Tugasakhir extends CI_Controller {
 
 		// get tugas akhir
 		$data['tugasakhir'] = $this->Thesis_model->getStudentThesis($idskripsi);
+		$data['acts'] = $this->Setting_model->getActs();
 		if(!$data['tugasakhir']) {
 			redirect('notfound');
 		}
@@ -46,6 +52,9 @@ class Tugasakhir extends CI_Controller {
 		if($data['tugasakhir']) {
 			$data['infobox'] = $this->load->view('tugasakhir/v_box_info_tugasakhir', $data, TRUE);
 			$data['logs'] = $this->Thesis_model->getLogBimbingan($data['tugasakhir'][0]->id);
+			$data['komentar'] = array();
+
+//			print_r($data['logs']);
 
 			foreach ($data['logs'] as $key => $value) {
 				$data['filelogs'][$key] = $this->Thesis_model->getLogBimbinganFiles($value->id);
@@ -95,6 +104,120 @@ class Tugasakhir extends CI_Controller {
 		$this->load->view('v_footer', $data);
 	}
 
+	public function student_progress($student_id) {
+		$data = array();
+		$data['js'] = '';
+
+		$data['setting'] = $this->Setting_model->getSetting();
+		$user = $this->input->cookie('user');
+		$userjson = json_decode($user);
+		$data['userjson'] = $userjson;
+
+		// check if lecturer
+		if($userjson->user_type!='lecturer') {
+			redirect('notfound');
+		} 
+		
+		// get tugas akhir
+		$data['tugasakhir'] = $this->Thesis_model->getStudentThesis(null, $student_id);
+		$data['acts'] = $this->Setting_model->getActs();
+		if(!$data['tugasakhir']) {
+			redirect('notfound');
+		} else {
+			$data['student'] = $this->Student_model->getStudent(null, $data['tugasakhir'][0]->student_id);
+			$periode = $this->Setting_model->get_active_periode();
+			$data['periode'] = $periode;
+			$data['quest'] = $this->Quest_model->get_finished_quest($data['student'][0]->user_id, "user_quest.quest_created_date >= '".$periode->start_periode."' AND user_quest.quest_created_date <= '".$periode->end_periode."'");
+		}
+
+		if($this->input->post('btnsubmitact')) {
+			$this->Thesis_model->advance_student_act($data['tugasakhir'][0]->id);
+			$this->session->set_flashdata('notif','success');
+			$this->session->set_flashdata('msg', 'Sukses menaikkanp progress mahasiswa');
+			redirect('tugasakhir/student_progress/'.$student_id);
+		}
+		
+		// toast
+		$data['js'] .= '
+		var Toast = Swal.mixin({
+	      toast: true,
+	      position: \'top-end\',
+	      showConfirmButton: false,
+	      timer: 3000
+	    });'; 
+
+	    // data table
+	    $data['js'] .= '
+	    $("#commontable").DataTable({
+	      "responsive": true, "lengthChange": false, "autoWidth": false,
+	    });
+	    ';
+
+	    if(!empty($this->session->flashdata('notif'))) {
+	    	$data['js'] .= '
+	    		 Toast.fire({
+			        icon: \''.$this->session->flashdata('notif').'\',
+			        title: \''.$this->session->flashdata('msg').'.\'
+			      });
+			    ';
+	    }
+
+		$this->load->view('v_header', $data);
+		$this->load->view('tugasakhir/v_box_info_tugasakhir_student', $data);
+		$this->load->view('v_footer', $data);
+	}
+
+	public function progress() {
+		$data = array();
+		$data['js'] = '';
+
+		$data['setting'] = $this->Setting_model->getSetting();
+		$user = $this->input->cookie('user');
+		$userjson = json_decode($user);
+		$data['userjson'] = $userjson;
+
+		// check if lecturer
+		if($userjson->user_type!='student') {
+			redirect('notfound');
+		} 
+		
+		// get tugas akhir
+		$data['tugasakhir'] = $this->Thesis_model->getStudentThesis(null, $userjson->id);
+		$data['acts'] = $this->Setting_model->getActs();
+		if(!$data['tugasakhir']) {
+			redirect('notfound');
+		}
+		
+		// toast
+		$data['js'] .= '
+		var Toast = Swal.mixin({
+	      toast: true,
+	      position: \'top-end\',
+	      showConfirmButton: false,
+	      timer: 3000
+	    });'; 
+
+	    // data table
+	    $data['js'] .= '
+	    $("#commontable").DataTable({
+	      "responsive": true, "lengthChange": false, "autoWidth": false,
+	    });
+	    ';
+
+	    if(!empty($this->session->flashdata('notif'))) {
+	    	$data['js'] .= '
+	    		 Toast.fire({
+			        icon: \''.$this->session->flashdata('notif').'\',
+			        title: \''.$this->session->flashdata('msg').'.\'
+			      });
+			    ';
+	    }
+
+		$this->load->view('v_header', $data);
+		$this->load->view('tugasakhir/v_box_info_tugasakhir', $data);
+		$this->load->view('v_footer', $data);
+	}
+
 	public function logbimbingan() {
 		$data = array();
 		$data['js'] = '';
@@ -106,17 +229,31 @@ class Tugasakhir extends CI_Controller {
 
 		if($this->input->post('btnkirim')) {
 			$this->Thesis_model->insertKomentar($this->input->post('idlogs'), $userjson->id, $this->input->post('komentar')); 
-			
 
-			$this->session->set_flashdata('notif','success');
-			$this->session->set_flashdata('msg', 'Tanggapan sukses tersimpan');
+			$qid = $this->Quest_model->get_user_quest_id('add_log_comment', $userjson->id);
+        	
+    		if($this->Quest_model->check_user_quest('add_log_comment', $userjson->id)) {
+    			$this->session->set_flashdata('notif', 'success');
+				$this->session->set_flashdata('msg', 'Quest tulis komentar di Log berhasil diselesaikan!');
+
+				$this->session->set_flashdata('trigger_rating', 'Add Log Comment '); 
+				$this->session->set_flashdata('trigger_quest_id', $qid); 
+				$quest_detected = true;
+    		} else {
+    			$this->session->set_flashdata('notif','success');
+				$this->session->set_flashdata('msg', 'Komentar sukses tersimpan');
+    		}
+			
 			redirect('tugasakhir/logbimbingan');
 		}
 
 		// get tugas akhir
 		$data['tugasakhir'] = $this->Thesis_model->getStudentThesis(null, $userjson->id, array('tugas_akhir.is_deleted' => 0, 'tugas_akhir.is_active' => 1));
-
+		$data['acts'] = $this->Setting_model->getActs();
+		
 		$data['filelogs'] = array();
+		$data['komentar'] = array();
+
 		// get bimbingan
 		if($data['tugasakhir']) {
 			$data['logs'] = $this->Thesis_model->getLogBimbingan($data['tugasakhir'][0]->id);
@@ -138,10 +275,71 @@ class Tugasakhir extends CI_Controller {
 					}
 				}
 			}
+			
 		}
 		$data['perihal'] = $this->Perihal_logs_model->get();
 
+		if($this->input->post('btnedit') && $data['tugasakhir']) {
+			$filename = array();
+			$judulfile = array();
+
+			// Iterate through each file
+        	for($i = 1; $i <= $this->input->post('jumlahupload_edit'); $i++) {
+        		if ($_FILES['file'.$i.'_edit']['error'] != 4) {
+        			// cek file first
+					$config['upload_path']          = './uploads/logbimbingan/';
+		            $config['allowed_types']        = 'pdf|docx|doc|csv|xls|xlsx|txt|jpg|jpeg|png';
+		            $config['max_size']             = 2000;
+		            $config['file_ext_tolower']		= TRUE;
+		            $config['encrypt_name']			= TRUE;
+
+		            $this->load->library('upload', $config);
+
+		            if(!$this->upload->do_upload('file'.$i.'_edit')) {
+		            	$this->session->set_flashdata('notif','error');
+						$this->session->set_flashdata('msg', $this->upload->display_errors());
+						redirect('tugasakhir/logbimbingan');
+		            } else {
+		            	$filename[] = $this->upload->data('file_name');
+		            	$judulfile[] = $this->input->post('filetext'.$i.'_edit'); 
+		            }
+        		}
+        	}
+
+		 	$this->Thesis_model->updateLogBimbingan($this->input->post('log_id'), $this->input->post('judul_edit'), $this->input->post('keterangan_edit'), $this->input->post('link_file_edit'), $this->input->post('perihal_edit'), $data['tugasakhir'][0]->id, $this->input->post('radio_publish_edit'));
+
+			foreach($filename as $key => $value) {
+				$this->Thesis_model->insertLogBimbinganFiles($this->input->post('log_id'), $judulfile[$key],  $value);
+			}
+
+			// cek if published
+			if($this->input->post('radio_publish_edit') == 'rilis') {
+				$qid = $this->Quest_model->get_user_quest_id('publish_log', $userjson->id);
+        	
+        		if($this->Quest_model->check_user_quest('publish_log', $userjson->id)) {
+        			$this->session->set_flashdata('notif', 'success');
+					$this->session->set_flashdata('msg', 'Quest publikasi log bimbingan berhasil diselesaikan!');
+
+					$this->session->set_flashdata('trigger_rating', 'Publikasi Log Bimbingan '); 
+					$this->session->set_flashdata('trigger_quest_id', $qid); 
+					$quest_detected = true;
+        		} else {
+        			$this->session->set_flashdata('notif', 'success');
+					$this->session->set_flashdata('msg',  'Log bimbingan sukses tersimpan');
+        		}
+			} else {
+				$this->session->set_flashdata('notif','success');
+				$this->session->set_flashdata('msg', 'Log bimbingan sukses tersimpan');
+			}
+
+			
+			redirect('tugasakhir/logbimbingan');
+		}
+
 		if($this->input->post('btnsubmit') && $data['tugasakhir']) {
+			//print_r($_POST);
+			//die();
+
 			$filename = array();
 			$judulfile = array();
 
@@ -167,17 +365,118 @@ class Tugasakhir extends CI_Controller {
 		            }
         		}
         	}
+
+
         
-			$insertid = $this->Thesis_model->insertLogBimbingan($this->input->post('judul'), $this->input->post('keterangan'), $this->input->post('link_file'), $this->input->post('perihal'), $data['tugasakhir'][0]->id);
+			$insertid = $this->Thesis_model->insertLogBimbingan($this->input->post('judul'), $this->input->post('keterangan'), $this->input->post('link_file'), $this->input->post('perihal'), $data['tugasakhir'][0]->id, $this->input->post('radio_publish'));
 
 			foreach($filename as $key => $value) {
 				$this->Thesis_model->insertLogBimbinganFiles($insertid, $judulfile[$key],  $value);
 			}
-			$this->session->set_flashdata('notif','success');
-			$this->session->set_flashdata('msg', 'Log bimbingan sukses tersimpan');
+
+			$quest_detected_success = false;
+
+			if($this->input->post('radio_publish') == "draft") {
+				$qid = $this->Quest_model->get_user_quest_id('add_log_draft', $userjson->id);
+	    		if($this->Quest_model->check_user_quest('add_log_draft', $userjson->id)) {
+	    			$this->session->set_flashdata('notif', 'success');
+					$this->session->set_flashdata('msg', 'Quest Draft log bimbingan berhasil diselesaikan!');
+
+					$this->session->set_flashdata('trigger_rating', 'Draft Log Bimbingan '); 
+					$this->session->set_flashdata('trigger_quest_id', $qid); 
+					$quest_detected_success = true;
+	    		} else {
+	    			$this->session->set_flashdata('notif','success');
+					$this->session->set_flashdata('msg', 'Log bimbingan sukses tersimpan');
+	    		}
+	    	} else {
+	    		$qid = $this->Quest_model->get_user_quest_id('add_log', $userjson->id);
+	    		if($this->Quest_model->check_user_quest('add_log', $userjson->id)) {
+	    			$this->session->set_flashdata('notif', 'success');
+					$this->session->set_flashdata('msg', 'Quest Log bimbingan berhasil diselesaikan!');
+
+					$this->session->set_flashdata('trigger_rating', 'Log Bimbingan '); 
+					$this->session->set_flashdata('trigger_quest_id', $qid); 
+					$quest_detected_success = true;
+	    		} else {
+	    			$this->session->set_flashdata('notif','success');
+					$this->session->set_flashdata('msg', 'Log bimbingan sukses tersimpan');
+	    		}
+	    	}			
+
+	    	if($quest_detected_success == false) {
+				$this->session->set_flashdata('notif','success');
+				$this->session->set_flashdata('msg', 'Log bimbingan sukses tersimpan');
+			}
 			redirect('tugasakhir/logbimbingan');
 		}
 
+		// delete file log bimbingan
+		$data['js'] .= '
+			$("body").on("click", ".btndelfilelog", function(){
+				var logid = $(this).attr("logid");
+				var btndel = $(this);
+
+				$.post("'.base_url('tugasakhir/delbimbinganfiles').'", {id:logid}, function(data) {
+					//console.log(data);
+					btndel.closest(".mr-4").remove();
+				});
+			});
+		';
+
+		if(!empty($this->session->flashdata('trigger_rating'))) {
+	    	$data['js'] .= '
+	    		// random show modal
+      			var randomNumber = Math.random() < 0.5 ? 0 : 1;
+	    		//var randomNumber = 1;
+      			console.log("trigger rating = '.$this->session->flashdata('trigger_rating').'")
+
+      			if(randomNumber == 1) {
+	      			$("#labelquest").html("Selamat, quest '.$this->session->flashdata('trigger_rating').' berhasil diselesaikan. Berapa ratingmu untuk quest ini?");
+	      			console.log($("#labelquest").html());
+					$("#qid").val('.$this->session->flashdata('trigger_quest_id').');
+					$("#modal-quest-rating").modal("show");
+				}
+			';
+	    }
+
+		// edit log bimbingan draft
+		$data['js'] .= '
+			$("body").on("click", ".btn-edit-log", function() {
+				var idc = $(this).attr("logid");
+				var tugasakhirid = '.$data['tugasakhir'][0]->id.';
+				$.post("'.base_url('tugasakhir/loadlog').'", {id:idc, tugas_akhir_id: tugasakhirid }, function(data) {
+					var obj = JSON.parse(data);
+					if(obj.result == "OK") {
+						console.log("OK");
+						console.log(obj.data);
+						$("#log_id").val(obj.data.id);
+						$("#judul_edit").val(obj.data.judul);
+						$("#perihal_edit").val(obj.data.perihal_logs_id);
+						$("#keterangan_edit").html(obj.data.keterangan);
+						$("#link_file_edit").val(obj.data.link_file);
+						if(obj.data.publikasi == "draft") {
+							$("#radio_draft_edit").prop("checked", true);
+						} 
+
+						console.log(obj.files);
+
+						var html="";
+						for(var i = 0; i < obj.files.length; i++) {
+							var item = obj.files[i];
+							console.log(item);
+
+							html += "<div class=\"mr-4\" >" +
+                "<a href=\"'.base_url('uploads/logbimbingan/').'" + item.nama_file + "\" target=\"_blank\" class=\"btn btn-outline-success btn-xs mr-1\">" + item.judul + "</a>" +
+                "<a  class=\"badge bg-red btndelfilelog\" logid=\"" + item.id + "\"><i class=\"fa fa-trash\"></i></a></div>";
+						}
+
+						$("#file_saat_ini").html(html);
+						
+					}
+				});
+			});
+		';
 		
 
 		// tambah file
@@ -197,13 +496,35 @@ class Tugasakhir extends CI_Controller {
 		});	
 		';
 
+		// tambah file untuk modal edit
+		$data['js'] .= '
+		var numfile_edit = 1;
+		$("#morefile_edit").on("click", function() {
+
+			numfile_edit++;
+			var str = "<div class=\"form-group\">" +
+              "<label for=\"file" + numfile_edit + "_edit\">Upload File #" + numfile_edit + "</label>" +
+              "<input type=\"text\" placeholder=\"Tuliskan judul file\" name=\"filetext" + numfile_edit + "_edit\" class=\"form-control\" />" +
+              "<input type=\"file\" accept=\".pdf, .docx, .doc, .csv, .xls, .xlsx, .txt, .jpg, .jpeg, .png\"  class=\"form-control\" name=\"file" + numfile_edit + "_edit\" id=\"file" + numfile_edit + "_edit\" >" +
+              "<small id=\"file" + numfile_edit + "_edit\" class=\"form-text text-muted\">Max. 2MB. Ekstensi yang diperbolehkan pdf, docx, doc, csv, xls, xlsx, txt, jpg, jpeg, dan png</small></div>";
+
+            $("#filecontainer_edit").append(str);
+            $("#jumlahupload_edit").val(numfile_edit);
+		});	
+		';
+
+
 		// reset modal
 		$data['js'] .= '
 			$("#modal-default").on("shown.bs.modal", function () {
 		        console.log("modal shown");
-		        $(this).find("input[type=\"text\"], textarea").val("");
-		        var file_upload_container_default = "<div class=\"form-group\">
-              <label for=\"file1\">Upload File #1</label>" +
+		        $("#judul").val("");
+		        $("#keterangan").html("");
+		        $("#perihal option:first").prop("selected", true);
+		        $("#radio_draft").prop("checked", true);
+		        $("#link_file").val("");
+
+		        var file_upload_container_default = "<div class=\"form-group\">   <label for=\"file1\">Upload File #1</label>" +
               "<input type=\"text\" name=\"filetext1\" placeholder=\"Tuliskan judul file\" class=\"form-control\" />" +              
               "<input type=\"file\" accept=\".pdf, .docx, .doc, .csv, .xls, .xlsx, .txt, .jpg, .jpeg, .png\"  class=\"form-control\" name=\"file1\" id=\"file1\" >" +
               "<small id=\"file1\" class=\"form-text text-muted\">Max. 2MB. Ekstensi yang diperbolehkan pdf, docx, doc, csv, xls, xlsx, txt, jpg, jpeg, dan png</small></div>";
@@ -265,8 +586,10 @@ class Tugasakhir extends CI_Controller {
 			if($this->input->post('btnsubmit')) {
 				$this->Thesis_model->insert_weekly_plan($userjson->id, $data['tugasakhir'][0]->id, $this->input->post('week_start'), $this->input->post('week_end'), $this->input->post('judul'), 0);
 
-				$this->session->set_flashdata('notif','success');
-				$this->session->set_flashdata('msg', 'Weekly plan sukses tersimpan');
+				
+    			$this->session->set_flashdata('notif','success');
+				$this->session->set_flashdata('msg', 'Weekly planner sukses tersimpan');
+    	
 				redirect('tugasakhir/weeklyplanner');	
 			}
 		}
@@ -284,6 +607,78 @@ class Tugasakhir extends CI_Controller {
 				$("#week_end").val(weekend);
 				$("#pekan").val(pekan);
 			});
+		';
+
+		// render chart
+		$data['js'] .= '
+		$(document).ready(function() {
+			var jumlahpekan= $("#jumlahpekan").val();
+			var jumlahplan = [];
+			var jumlahselesai = [];
+			var jumlahweek = [];
+
+			for(var i = 1; i< jumlahpekan; i++) {
+				jumlahweek.push(i);
+				jumlahplan.push($("#jumlahplan_" + i).val());
+				jumlahselesai.push($("#jumlahplanselesai_" + i).val());
+			}
+
+			console.log(jumlahplan);
+
+			var areaChartData = {
+		      labels  : jumlahweek,
+		      datasets: [
+		        {
+		          label               : "Jumlah Plan",
+		          backgroundColor     : "rgba(60,141,188,0.9)",
+		          borderColor         : "rgba(60,141,188,0.8)",
+		          pointRadius          : false,
+		          pointColor          : "#3b8bba",
+		          pointStrokeColor    : "rgba(60,141,188,1)",
+		          pointHighlightFill  : "#fff",
+		          pointHighlightStroke: "rgba(60,141,188,1)",
+		          data                : jumlahplan
+		        },
+		        {
+		          label               : "Plan Selesai",
+		          backgroundColor     : "rgba(210, 214, 222, 1)",
+		          borderColor         : "rgba(210, 214, 222, 1)",
+		          pointRadius         : false,
+		          pointColor          : "rgba(210, 214, 222, 1)",
+		          pointStrokeColor    : "#c1c7d1",
+		          pointHighlightFill  : "#fff",
+		          pointHighlightStroke: "rgba(220,220,220,1)",
+		          data                : jumlahselesai
+		        },
+		      ]
+		    }
+
+		    var barChartData = $.extend(true, {}, areaChartData);
+
+		    var stackedBarChartCanvas = $("#stackedBarChart").get(0).getContext("2d");
+	    	var stackedBarChartData = $.extend(true, {}, barChartData);
+
+		    var stackedBarChartOptions = {
+		      responsive              : true,
+		      maintainAspectRatio     : false,
+		      scales: {
+		        xAxes: [{
+		          stacked: true,
+		        }],
+		        yAxes: [{
+		          stacked: true
+		        }]
+		      }
+		    }
+
+		    new Chart(stackedBarChartCanvas, {
+		      type: "bar",
+		      data: stackedBarChartData,
+		      options: stackedBarChartOptions
+		    });
+		});
+
+		
 		';
 
 		// focus on judul when bootstrap modal shown
@@ -319,6 +714,25 @@ class Tugasakhir extends CI_Controller {
 						console.log("OK");
 						checkplan.prop("disabled", true);
 						checkplan.closest(".row").find(".plandel").remove();
+						if(obj.quest_title != null) {
+							Toast.fire({
+						    	icon: "success",
+						   		title: "Quest Finish Weekly Plan berhasil diselesaikan!"
+					   		});
+
+
+			      			// random show modal
+			      			var randomNumber = Math.random() < 0.5 ? 0 : 1;
+			      			//randomNumber = 1;
+
+			      			if(randomNumber == 1) {
+				      			$("#labelquest").html("Selamat, quest " + obj.quest_title + " berhasil diselesaikan. Berapa ratingmu untuk quest ini?");
+				      			console.log($("#labelquest").html());
+	    						$("#qid").val(obj.quest_id);
+	    						$("#modal-quest-rating").modal("show");
+	    					}
+			      		}
+
 					}
 				});
 				
@@ -380,6 +794,20 @@ class Tugasakhir extends CI_Controller {
 
 			      		$("#modal-default").modal("hide");
 
+			      		console.log("quest title" +obj.quest_title);
+
+			      		if(obj.quest_title != null) {
+			      			// random show modal
+			      			var randomNumber = Math.random() < 0.5 ? 0 : 1;
+			      			//randomNumber = 1;
+
+			      			if(randomNumber == 1) {
+				      			$("#labelquest").html("Selamat, quest " + obj.quest_title + " berhasil diselesaikan. Berapa ratingmu untuk quest ini?");
+				      			console.log($("#labelquest").html());
+	    						$("#qid").val(obj.quest_id);
+	    						$("#modal-quest-rating").modal("show");
+	    					}
+			      		}
 					}
 				});
 			});
@@ -479,6 +907,12 @@ class Tugasakhir extends CI_Controller {
 
 		$data['tugasakhir'] = $this->Thesis_model->getStudentThesis(null, null," (l1.user_id = '".$userjson->id."' OR l2.user_id = '".$userjson->id."') ");
 
+		$data['jumlahlog'] = array();
+
+		foreach ($data['tugasakhir'] as $key => $value) {
+			$data['jumlahlog'][$key] = $this->Thesis_model->get_number_of_log_bimbingan_need_comment($value->id);
+		}
+
 		// data table
 	    $data['js'] .= '
 	    $("#commontable").DataTable({
@@ -574,7 +1008,6 @@ class Tugasakhir extends CI_Controller {
 			$this->load->library('form_validation');
 			$this->form_validation->set_rules('judul', 'Judul', 'required', array('required' => '%s wajib diisi.'));
 			$this->form_validation->set_rules('lecturer1_id', 'Dosen Pembimbing 1', 'required', array('required' => '%s wajib diisi.'));
-			$this->form_validation->set_rules('lecturer2_id', 'Dosen Pembimbing 2', 'required', array('required' => '%s wajib diisi.'));
 			$this->form_validation->set_rules('proposal_url', 'Link Proposal', 'required|valid_url', array('required' => '%s wajib diisi.', 'valid_url' => '%s tidak valid.'));
 			
 			$error = '';
@@ -590,17 +1023,21 @@ class Tugasakhir extends CI_Controller {
             	if($this->input->post('lecturer1_id') == '-') {
             		$error = 'Dosbing 1 harus dipilih';
             	}
-            	if($this->input->post('lecturer2_id') == '-') {
-            		$error = 'Dosbing 2 harus dipilih';
-            	}
-            	if($this->input->post('lecturer1_id') == $this->input->post('lecturer2_id')) {
-            		$error = 'Dosbing 1 & 2 harus berbeda';
-            	}
+            	if($this->input->post('lecturer2_id') != '-') {
+	            	if($this->input->post('lecturer1_id') == $this->input->post('lecturer2_id')) {
+	            		$error = 'Dosbing 1 & 2 harus berbeda';
+	            	}
+	            }
             }
 
 			$judul = trim($this->input->post('judul'));
 			$lecturer1_id = $this->input->post('lecturer1_id');
-			$lecturer2_id = $this->input->post('lecturer2_id');
+			if($this->input->post('lecturer2_id') != '-') {
+				$lecturer2_id = $this->input->post('lecturer2_id');
+			} else {
+				$lecturer2_id = null;
+			}
+			
 			$tanggal_st = $this->input->post('tanggal_st');
 			$tanggal_akhir_st = $this->input->post('tanggal_akhir_st');
 			$proposal_url = $this->input->post('proposal_url');
@@ -710,9 +1147,23 @@ class Tugasakhir extends CI_Controller {
 
 
 	// ajax call section
+	public function loadlog() {
+		$user = $this->input->cookie('user');
+		$userjson = json_decode($user);
+		$result = $this->Thesis_model->getLogBimbinganByID($this->input->post('id'), $this->input->post('tugas_akhir_id'));
+		$resultfiles = $this->Thesis_model->getLogBimbinganFiles($this->input->post('id'));
+		echo json_encode(array("result" => "OK", "data" => $result, "files" => $resultfiles));
+	}
+
 	public function getbimbingandetil() {
 		$result = $this->Thesis_model->getStudentThesis($this->input->post('id'));
 		echo json_encode($result);
+	}
+
+	public function delbimbinganfiles() {
+		$this->Thesis_model->delLogBimbinganFiles($this->input->post('id'));
+
+		echo json_encode(array("result" => "OK"));
 	}
 
 	public function submitweeklyplan() {
@@ -721,7 +1172,21 @@ class Tugasakhir extends CI_Controller {
 
 		$id = $this->Thesis_model->insert_weekly_plan($userjson->id, $this->input->post('tugasakhirid'), $this->input->post('week_start'), $this->input->post('week_end'), $this->input->post('judul'), 0);
 
-		echo json_encode(array("result" => "OK", "lastid" => $id));
+		$qid = $this->Quest_model->get_user_quest_id('add_weekly', $userjson->id);
+
+		if($this->Quest_model->check_user_quest('add_weekly', $userjson->id)) {
+			// tes trigger weekly planner
+			//$this->session->set_flashdata('trigger_rating', 'Weekly Planner'); 
+			//$this->session->set_flashdata('trigger_quest_id', $qid); 
+
+			//$this->session->set_flashdata('type', 'success');
+			//$this->session->set_flashdata('message', 'Quest weekly planner berhasil diselesaikan!');
+			echo json_encode(array("result" => "OK", "lastid" => $id, "quest_title" => 'Weekly Planner', "quest_id" => $qid));
+		} else {
+			echo json_encode(array("result" => "OK", "lastid" => $id));
+		}
+
+		
 	}
 
 	public function delplan() {
@@ -735,7 +1200,14 @@ class Tugasakhir extends CI_Controller {
 		$user = $this->input->cookie('user');
 		$userjson = json_decode($user);
 		$this->Thesis_model->check_plans($this->input->post('planid'), $userjson->id);
-		echo json_encode(array("result" => "OK"));
+
+		$qid = $this->Quest_model->get_user_quest_id('complete_weekly', $userjson->id);
+
+		if($this->Quest_model->check_user_quest('complete_weekly', $userjson->id)) {
+			echo json_encode(array("result" => "OK","quest_title" => 'Complete Weekly Plan', "quest_id" => $qid));
+		} else {
+			echo json_encode(array("result" => "OK"));
+		}
 	}
 
 	public function editplan() {

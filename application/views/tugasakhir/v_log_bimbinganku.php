@@ -23,17 +23,21 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
-            <?php echo $infobox; ?>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="text-right">
-              <a href="" class="btn btn-primary"  data-toggle="modal" data-target="#modal-default">Tambah Log</a>
+            <div class="card card-primary card-outline">
+              <div class="card-header">
+                <h3 class="card-title">Tugas Akhir</h3>
+              </div>
+      <!-- /.card-header -->
+              <div class="card-body" style="display: block;">
+                <dl>
+                  <dt><?php echo $tugasakhir[0]->judul; ?></dt>
+                  <dd><?php echo $tugasakhir[0]->f1; ?> &amp; <?php echo $tugasakhir[0]->f2; ?></dd>
+                </dl>
+              </div>
             </div>
           </div>
         </div>
-       
+        
             <?php if($logs) { ?>
                <div class="row mt-3" >
           <div class="col-lg-12">
@@ -41,43 +45,54 @@
               <div class="card-body">
                 <!-- The timeline -->
             <div class="timeline timeline-inverse">
-                    <?php  foreach ($logs as $key => $value) { ?>
-<!-- timeline time label -->
-              <div class="time-label">
-                <span class="bg-primary">
-                  <?php echo strftime("%d %B %Y", strtotime($value->tanggal)); ?> (Bimbingan #<?php echo $key+1; ?>)
-                </span>
-              </div>
-              <!-- /.timeline-label -->
+                    <?php $total = count($logs); 
+
+                    foreach ($logs as $key => $value) { 
+                      if($value->publikasi != 'draft') {
+                      ?>
+
               <!-- timeline item -->
               <div>
                 <i class="fas fa-clipboard-list bg-secondary"></i>
 
-                <div class="timeline-item">
-                  <h3 class="timeline-header"><?php echo $value->judul; ?></h3>
+                <div class="accordion timeline-item " style="<?php if($value->publikasi == 'draft') { echo 'background-color: #eaeaea;'; } ?>" id="accordionExample">
+                  <span class="text-muted float-right pt-2 mr-2"><strong><?php echo strftime("%d %B %Y", strtotime($value->tanggal)); ?></strong></span>
+                  
+                  <h3 class="timeline-header " data-toggle="collapse" data-target="#collapse<?php echo $value->id; ?>" aria-expanded="true" aria-controls="collapse<?php echo $value->id; ?>">(Bimbingan #<?php echo $total-$key; ?>) - <?php echo $value->judul; ?> <?php if($value->publikasi == "draft") { echo "<span class='badge badge-primary'>DRAFT</span>"; }  ?></h3>
+                  
 
                   <div class="timeline-body">
-                    <?php echo $value->keterangan; ?>
-                    <br/>
+                    <?php echo $value->keterangan; ?><br/>
+                    <div class="d-flex justify-content-between">
                     <?php 
 
                     $table_have_content = false;
                     if($filelogs[$key]) {  $table_have_content = true; ?>
-                    <p>
+                    <p style="margin:0px;">
                       File &amp; Tautan: 
                       <?php foreach ($filelogs[$key] as $key2 => $value2) {  ?>
-                        <a href="<?php echo base_url('uploads/logbimbingan/'.$value2->nama_file); ?>" class="btn btn-outline-success btn-xs"><span class="fa fa-file"></span> <?php echo $value2->judul; ?></a>
+                        <a href="<?php echo base_url('uploads/logbimbingan/'.$value2->nama_file); ?>" class="btn btn-outline-success btn-xs"><span class="fa fa-file"></span> <?php echo character_limiter($value2->judul, 10); ?></a>
                       <?php } ?>
 
                       <?php if($value->link_file != '') { $table_have_content = true; ?>
                         <a href="<?php echo $value->link_file; ?>" class="btn btn-outline-success btn-xs"><span class="fa fa-link"></span> Buka Tautan</a>
                       <?php } ?>
                     </p>
-                  <?php } ?>
+                  <?php }  else { echo '<p></p>'; } ?>
+                      <div>
+                        <?php if($value->publikasi == "draft") { ?>
+                          <button type="button" data-toggle="modal" data-target="#modal-edit-log" logid="<?php echo $value->id; ?>" class="btn btn-xs btn-success btn-edit-log"><i class="fa fa-edit"  ></i> Edit Log</button>
+                        <?php } ?>
 
+                        <button type="button" data-toggle="collapse" data-target="#collapse<?php echo $value->id; ?>" aria-expanded="true" aria-controls="collapse<?php echo $value->id; ?>" class="btn btn-xs btn-outline-primary">Komentar (<?php echo count($komentar[$key]); ?>)</button>
+                      </div>
+                    </div>
+
+                   <div id="collapse<?php echo $value->id; ?>" class="mt-2 collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
                     <?php foreach ($komentar[$key] as $key3 => $value3) { ?>
-                    <hr/>
-                    <div class="post" style="padding-bottom:0px; border-bottom: none; margin-bottom: 0px;">                    
+                      <hr/>
+                    
+                    <div class="post " style="padding-bottom:0px; border-bottom: none; ">                    
                         <div class="user-block">
                         <img class="img-circle img-bordered-sm" src="../../dist/img/user1-128x128.jpg" alt="user image">
                         <span class="username">
@@ -91,23 +106,24 @@
                       </p>
                     </div>
                       <?php } ?>
-                      
 
-                    <form class="form-horizontal" method="post" action="<?php echo base_url('tugasakhir/logbimbinganku/'.$tugasakhir[0]->id); ?>">
-                    <input type="hidden" name="idlogs" value="<?php echo $value->id; ?>"/>
-                    <div class="input-group input-group-sm mb-0">
-                      <input class="form-control form-control-sm" placeholder="Tuliskan tanggapan/komentar" name="komentar">
-                      <div class="input-group-append">
-                        <button type="submit" name="btnkirim" value="submit" class="btn btn-danger">Kirim</button>
-                      </div>
-                    </div>
-                  </form>
+                      <form class="form-horizontal" method="post" action="<?php echo base_url('tugasakhir/logbimbinganku/'.$tugasakhir[0]->id); ?>">
+                        <input type="hidden" name="idlogs" value="<?php echo $value->id; ?>"/>
+                        <div class="input-group input-group-sm mb-0">
+                          <input class="form-control form-control-sm" placeholder="Tuliskan tanggapan/komentar" name="komentar">
+                          <div class="input-group-append">
+                            <button type="submit" name="btnkirim" value="submit" class="btn btn-danger">Kirim</button>
+                          </div>
+                        </div>
+                      </form>
+                   </div>
                   </div>
-
                 </div>
+
               </div>
               <!-- END timeline item -->
-            <?php } ?>
+            <?php }
+            } ?>
 
             </div>
               </div>
@@ -115,6 +131,16 @@
           </div>
         </div>
         <!-- /.row -->
+      <?php } else { ?>
+        <div class="row mt-3" >
+          <div class="col-lg-12">
+            <div class="card card-primary">
+              <div class="card-body">
+                <p class="text-center">Mahasiswa ini belum pernah menuliskan log bimbingan. Harap menghubungi mahasiswa yang bersangkutan untuk segera menuliskan log/progres bimbingannya.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       <?php } ?>
 
       </div><!-- /.container-fluid -->

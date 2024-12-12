@@ -24,6 +24,9 @@
   <link rel="stylesheet" href="<?php echo base_url('dist/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css'); ?>">
   <!-- Theme style -->
   <link rel="stylesheet" href="<?php echo base_url('dist/css/adminlte.min.css'); ?>">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="<?php echo base_url('dist/css/custom.css'); ?>">
 </head>
 <body class="hold-transition light-mode sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed">
 <div class="wrapper">
@@ -76,13 +79,20 @@
     <div class="sidebar">
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <?php if($userjson->avatar_image_url != '') { ?>
         <div class="image" id="sidebarpropic" style="width:2.1em; height: 2.1em; border-radius: 50%; margin-left: auto; margin-right: auto;
-                background: url('<?php echo base_url('uploads/avatars/'.$userjson->avatar_image_filename); ?>');  background-size: cover;
+                background: url('<?php if($userjson->avatar_image_url) { echo $userjson->avatar_image_url; } else { echo '';  } ?>');  background-size: 270%;
+                background-position: center 20%;
+                background-color: gray;
     background-repeat: no-repeat;  " >
           
         </div>
+      <?php }  else { ?>
+        <img class="img-circle img-bordered-sm" src="<?php echo base_url('images/assets/propic_blank.jpg');  ?>" alt="user image">
+      <?php } ?>
         <div class="info" style="flex-grow: 1;">
-          <a href="<?php echo base_url('myprofile'); ?>" class="d-block"><?php echo $userjson->first_name.' '.$userjson->last_name; ?></a>
+          <a href="<?php echo base_url('myprofile/ubahavatar'); ?>" class="d-block"><?php echo $userjson->first_name.' '.$userjson->last_name;
+ ?></a>
         </div>
       </div>
 
@@ -135,7 +145,7 @@
 
               <?php if($userjson->user_type =='lecturer') { ?>
               <li class="nav-item">
-                <a href="<?php echo base_url('tugasakhir/bimbinganku'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir' && $this->uri->segment(2) == 'bimbinganku') { echo 'active'; } ?>">
+                <a href="<?php echo base_url('tugasakhir/bimbinganku'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'tugasakhir' && ($this->uri->segment(2) == 'bimbinganku' || $this->uri->segment(2) == 'logbimbinganku')) { echo 'active'; } ?>">
                   <i class="nav-icon far fa-circle nav-icon"></i>
                   <p>
                     Bimbinganku
@@ -145,6 +155,14 @@
               <?php } ?>
 
               <?php if($userjson->user_type =='student') { ?>
+              <li class="nav-item">
+                <a href="<?php echo base_url('tugasakhir/progress'); ?>" class="nav-link <?php if($this->uri->segment(2) == 'progress') { echo 'active'; } ?>">
+                  <i class="nav-icon far fa-circle nav-icon"></i>
+                  <p>
+                    Progress Skripsi
+                  </p>
+                </a>
+              </li>
               <li class="nav-item">
                 <a href="<?php echo base_url('tugasakhir/logbimbingan'); ?>" class="nav-link <?php if($this->uri->segment(2) == 'logbimbingan') { echo 'active'; } ?>">
                   <i class="nav-icon far fa-circle nav-icon"></i>
@@ -167,8 +185,27 @@
             </ul>
           </li>
 
-          
+          <?php if($userjson->user_type =='student') { ?>
+          <li class="nav-item">
+            <a href="<?php echo base_url('thejourney'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'thejourney') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-map-signs"></i>
+              <p>
+                The Journey
+              </p>
+            </a>
+          </li>
 
+           <li class="nav-item">
+            <a href="<?php echo base_url('quest'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'quest') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-tasks"></i>
+              <p>
+                Quest
+              </p>
+            </a>
+          </li>
+          <?php } ?>
+
+          
           <li class="nav-item">
             <a href="<?php echo base_url('thesis/recommender'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'thesis') { echo 'active'; } ?>">
               <i class="nav-icon fas fa-th"></i>
@@ -176,7 +213,7 @@
                 Sistem Rekomendasi
               </p>
             </a>
-          </li>
+          </li> 
 
           <li class="nav-item">
             <a href="<?php echo base_url('diskusi/home'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'diskusi') { echo 'active'; } ?>">
@@ -187,6 +224,40 @@
             </a>
           </li>
 
+          <?php if($userjson->user_type =='student') { ?>
+          <li class="nav-item">
+            <a href="<?php echo base_url('myclan'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'myclan') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-users"></i>
+              <p>
+                My Clan
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?php echo base_url('timeline'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'timeline') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-stream"></i>
+              <p>
+                Timeline
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?php echo base_url('leaderboard'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'leaderboard') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-splotch"></i>
+              <p>
+                Leaderboard
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="<?php echo base_url('achievements'); ?>" class="nav-link <?php if($this->uri->segment(1) == 'achievements') { echo 'active'; } ?>">
+              <i class="nav-icon fas fa-ribbon"></i>
+              <p>
+                Achievements
+              </p>
+            </a>
+          </li>
+        <?php } ?>
           
 
           <li class="nav-item" style="    border-top: 1px solid #4f5962">
